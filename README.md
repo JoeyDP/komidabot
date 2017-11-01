@@ -1,3 +1,5 @@
+Fork of [Wout Bittremieux's `komidabot`](https://github.com/bittremieux/komidabot), adapted for a Facebook chatbot. This code is provided to the first year students to learn git and ssh.
+
 komidabot
 =========
 

@@ -11,7 +11,6 @@ import dateparser
 import lxml.html
 import pdfquery
 import requests
-from rtmbot.core import Job
 
 
 # disable low-level pdfminer logging
@@ -228,15 +227,11 @@ def init_database():
     conn.close()
 
 
-class KomidaUpdate(Job):
+def update():
+    # create the database if needed
+    if not os.path.exists('menu.db'):
+        init_database()
 
-    def run(self, slack_client):
-        # create the database if needed
-        if not os.path.exists('menu.db'):
-            init_database()
+    # update the menu
+    update_menus()
 
-        # update the menu
-        update_menus()
-
-        # expects an iterable
-        return []
