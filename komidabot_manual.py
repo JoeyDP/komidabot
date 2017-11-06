@@ -1,7 +1,4 @@
 import datetime
-import sqlite3
-import collections
-import itertools
 import random
 import os
 import komida_parser
@@ -15,31 +12,6 @@ os.environ.update(dotenv)
 CAMPUS = os.environ.get("CAMPUS", 'cmi')
 FB_TOKEN = os.environ["FB_TOKEN"]
 FB_RECEIVER_ID = os.environ["FB_RECEIVER_ID"]
-
-
-def get_menu(campuses, dates):
-    """
-    Retrieve the menu on the given dates for the given campuses from the database.
-
-    Args:
-        campuses: The campuses for which the menu is retrieved.
-        dates: The dates for which the menu is retrieved.
-
-    Returns:
-        A nested dictionary with as keys the requested dates and campuses, and for each of these possibilities a
-        dictionary with as key the type of menu item and as values the menu content and the prices for students and
-        staff.
-    """
-    conn = sqlite3.connect('menu.db')
-    c = conn.cursor()
-
-    menu = collections.defaultdict(dict)
-    for date, campus in itertools.product(dates, campuses):
-        c.execute('SELECT type, item, price_student, price_staff FROM menu WHERE date = ? AND campus = ?', (date, campus))
-        for menu_type, menu_item, price_student, price_staff in c.fetchall():
-            menu[(date, campus)][menu_type] = (menu_item, price_student, price_staff)
-
-    return menu
 
 
 def create_attachments(menu):
@@ -112,7 +84,7 @@ def send_menu():
     komida_parser.update()
 
     today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
-    menus = get_menu([CAMPUS], [today])
+    menus = komida_parser.get_menu([CAMPUS], [today])
 
     if len(menus) > 0:
         message = create_attachments(menus)

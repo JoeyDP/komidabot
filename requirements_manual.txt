@@ -1,0 +1,5 @@
+dateparser==0.5.1
+dotenv==0.0.5
+lxml==3.7.2
+pdfquery==0.4.3
+requests==2.12.5
