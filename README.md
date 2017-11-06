@@ -5,7 +5,7 @@ komidabot
 
 A chat bot to request the daily menu at the [komida restaurants](https://www.uantwerpen.be/en/campus-life/catering/) of the [University of Antwerp](https://www.uantwerpen.be/en/).
 
-![komidabot](komidabot.png)
+![komidabot](res/komidabot.png)
 
 About
 -----
@@ -24,7 +24,7 @@ This can be useful if you want to receive daily updates of the menu. Simply add 
 
 Note that you need to configure a Facebook page to send the message from. Provide following information in a `.env` file:
  - CAMPUS: The campus of which to report the menu. Default is cmi.
- - FB_TOKEN: FB token of the page where messages are sent from. The following permissions are required: _pages\_messaging_ and _pages\_messaging\_subscriptions_
+ - PAGE_ACCESS_TOKEN: FB token of the page where messages are sent from. The following permissions are required: _pages\_messaging_ and _pages\_messaging\_subscriptions_
  - FB_RECEIVER_ID: A Page Scoped User Id (PSID) of the user to send the message. You can use the interactive chatbot to help figure this out. Send `What is my PSID?` to [Komidabot UA](m.me/1502601723123151)
 
 #### Interactive
@@ -35,7 +35,7 @@ Komidabot will reply to menu requests by:
 * Campus choices can be specified using the full campus name or the three-letter campus abbreviation (Drie Eiken CDE, Middelheim / CMI, stad / city / CST).
 * Dates can be specified using the day of the week (Monday - Sunday) or using temporal nouns (yesterday, today, tomorrow).
 
-You can also run it yourself using the Flask app in `komidabot_interactive.py`. This web server can receive messages from Facebook and replies with the requested menu. Note that this also requires a Facebook app and the appropriate configuration variables (see source code).
+You can also run it yourself using the Flask app in `app.py`. This web server can receive messages from Facebook and replies with the requested menu. Note that this also requires a Facebook app and the appropriate configuration variables (see source code).
 
 Installation
 ------------
