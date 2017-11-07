@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from util import *
-import komidabot_interactive
+from .komidabot.komidabot import Komidabot
 
 PROFILE_URL = "https://graph.facebook.com/v2.9/me/messenger_profile"
 PARAMS = {"access_token": os.environ["PAGE_ACCESS_TOKEN"]}
@@ -29,15 +29,10 @@ def setup():
     post(data)
 
 
-def getStartedButtonData(payload=None):
-    if payload is None:
-        payload = {
-            "type": "action",
-            "action": "welcome"
-        }
+def getStartedButtonData():
     data = {
         "get_started": {
-            "payload": json.dumps(komidabot_interactive.Komidabot.sendWelcome())
+            "payload": json.dumps(Komidabot.sendWelcome())
         }
     }
     return data
@@ -65,14 +60,14 @@ def getMenuData():
                 "type": "nested",
                 "call_to_actions": [
                     {
-                        "title": "List pages",
+                        "title": "Subscribe",
                         "type": "postback",
-                        "payload": json.dumps(komidabot_interactive.Komidabot.subscribe())
+                        "payload": json.dumps(Komidabot.subscribe())
                     },
                     {
-                        "title": "Resend Pending",
+                        "title": "Unsubscribe",
                         "type": "postback",
-                        "payload": json.dumps(komidabot_interactive.Komidabot.unsubscribe())
+                        "payload": json.dumps(Komidabot.unsubscribe())
                     }
                 ]
             },
