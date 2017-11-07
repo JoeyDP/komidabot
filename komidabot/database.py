@@ -18,7 +18,26 @@ class Person(db.Model):
     __tablename__ = "person"
 
     id = db.Column(db.String(128), primary_key=True)
-    subscribed = db.Column(db.Boolean)
+    subscribed = db.Column(db.Boolean, default=True)
 
+    @staticmethod
+    def subscribe(sender_id):
+        person = Person.query.filter_by(id=sender_id).one_or_none()
+        if not person:
+            person = Person()
+            person.id = sender_id
+            db.session.add(person)
+        person.subscribed = True
+        db.session.commit()
+
+    @staticmethod
+    def unsubscribe(sender_id):
+        person = Person.query.filter_by(id=sender_id).one_or_none()
+        if not person:
+            person = Person()
+            person.id = sender_id
+            db.session.add(person)
+        person.subscribed = False
+        db.session.commit()
 
 db.create_all()

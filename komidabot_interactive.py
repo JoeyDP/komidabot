@@ -77,5 +77,3 @@ def receivedPostback(sender, recipient, payload):
         traceback.print_exc()
 
 
-if __name__ == '__main__':
-    app.run(debug=DEBUG)

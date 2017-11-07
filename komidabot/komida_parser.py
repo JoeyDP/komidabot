@@ -216,11 +216,11 @@ def store_menu(menu):
         entry.price_staff = price_staff
         db.session.add(entry)
 
-        try:
-            db.session.commit()
-        except exc.SQLAlchemyError as e:
-            # this menu item is most likely already present in the database
-            logging.debug('Could not insert into the menu database: {}'.format(e))
+    try:
+        db.session.commit()
+    except exc.SQLAlchemyError as e:
+        # this menu item is most likely already present in the database
+        db.session.rollback()
 
 
 def update_menus():
@@ -244,3 +244,6 @@ def update():
     # update the menu
     update_menus()
 
+
+if __name__ == "__main__":
+    update()
