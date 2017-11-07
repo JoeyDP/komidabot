@@ -89,6 +89,11 @@ class Komidabot(Chatbot):
         if 'psid' in message.lower():
             msg = TextMessage("Your PSID is {}".format(sender))
             msg.send(sender)
+        else:
+            campusses = get_campusses(message)
+            times = get_dates(message)
+            if campusses and times:
+                self.sendMenu(sender, campusses, times)
 
     def sendMenu(self, recipient, campusses=('cmi'), times=None, isResponse=True):
         if times is None:
@@ -146,6 +151,43 @@ class Komidabot(Chatbot):
         if ADMIN_SENDER_ID:
             notification = TextMessage("Exception:\t{}".format(str(e)))
             notification.send(ADMIN_SENDER_ID)
+
+
+def get_campusses(text):
+    """
+    Check which campus is mentioned in the given text.
+    A campus can be denoted by its full name or by its three-letter acronym.
+    Args:
+        text: The text in which the occurrence of the campuses is checked.
+    Returns:
+        A list with acronyms for all UAntwerp campuses that were mentioned in the text. Defaults to CMI if no campus is
+        explicitly mentioned.
+    """
+    campus_options = [('cde', ['cde', 'drie eiken']), ('cgb', ['cgb', 'groenenborger']),
+                      ('cmi', ['cmi', 'middelheim']), ('cst', ['cst', 'stad', 'city'])]
+
+    campus = sorted([c_code for c_code, c_texts in campus_options if any(c_text in text for c_text in c_texts)])
+    return campus if len(campus) > 0 else ['cmi']
+
+
+def get_dates(text):
+    """
+    Check which date is mentioned in the given text.
+    A date can be referred to by the day of week (Monday - Sunday) or by 'yesterday', 'today', and 'tomorrow'.
+    Args:
+        text: The text in which the occurrence of dates is checked.
+    Returns:
+        A list with `datetime` objects for all of the dates that were mentioned in the text. Defaults to today if no
+        date is explicitly mentioned.
+    """
+    today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+    date_options = [('today', 0), ('tomorrow', 1), ('yesterday', -1), ('monday', 0 - today.weekday()),
+                    ('tuesday', 1 - today.weekday()), ('wednesday', 2 - today.weekday()),
+                    ('thursday', 3 - today.weekday()), ('friday', 4 - today.weekday()),
+                    ('saturday', 5 - today.weekday()), ('sunday', 6 - today.weekday())]
+
+    dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text])
+    return dates if len(dates) > 0 else [today]
 
 
 from .facebook import profile
