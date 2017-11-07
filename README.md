@@ -35,7 +35,7 @@ Komidabot will reply to menu requests by:
 * Campus choices can be specified using the full campus name or the three-letter campus abbreviation (Drie Eiken CDE, Middelheim / CMI, stad / city / CST).
 * Dates can be specified using the day of the week (Monday - Sunday) or using temporal nouns (yesterday, today, tomorrow).
 
-You can also run it yourself using the Flask app in `app.py`. This web server can receive messages from Facebook and replies with the requested menu. Note that this also requires a Facebook app and the appropriate configuration variables (see source code). Some files have been added to run it on [Heroku](heroku.com).
+You can also run it yourself using the Flask app in `komidabot_interactive.py`. This web server can receive messages from Facebook and replies with the requested menu. Note that this also requires a Facebook app and the appropriate configuration variables (see source code). Some files have been added to run it on [Heroku](heroku.com).
 
 Installation
 ------------
