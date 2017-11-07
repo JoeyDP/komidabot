@@ -95,7 +95,9 @@ class Komidabot(Chatbot):
             if campusses and times:
                 self.sendMenu(sender, campusses, times)
 
-    def sendMenu(self, recipient, campusses=('cmi'), times=None, isResponse=True):
+    def sendMenu(self, recipient, campusses=None, times=None, isResponse=True):
+        if campusses is None:
+            campusses = ['cmi']
         if times is None:
             today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
             times = [today]
@@ -166,7 +168,7 @@ def get_campusses(text):
     campus_options = [('cde', ['cde', 'drie eiken']), ('cgb', ['cgb', 'groenenborger']),
                       ('cmi', ['cmi', 'middelheim']), ('cst', ['cst', 'stad', 'city'])]
 
-    campus = sorted([c_code for c_code, c_texts in campus_options if any(c_text in text for c_text in c_texts)])
+    campus = sorted([c_code for c_code, c_texts in campus_options if any(c_text in text.lower() for c_text in c_texts)])
     return campus
 
 
@@ -186,7 +188,7 @@ def get_dates(text):
                     ('thursday', 3 - today.weekday()), ('friday', 4 - today.weekday()),
                     ('saturday', 5 - today.weekday()), ('sunday', 6 - today.weekday())]
 
-    dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text])
+    dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text.lower()])
     return dates
 
 
