@@ -86,7 +86,7 @@ class postback:
 
 class Komidabot(Chatbot):
     def onMessage(self, sender, message):
-        if 'PSID' in message.lower():
+        if 'psid' in message.lower():
             msg = TextMessage("Your PSID is {}".format(sender))
             msg.send(sender)
 
