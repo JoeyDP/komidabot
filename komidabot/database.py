@@ -1,7 +1,6 @@
 from komidabot import db
 
 
-
 class Menu(db.Model):
     """ Database table for Komida menu. """
     __tablename__ = "menu"
@@ -14,8 +13,12 @@ class Menu(db.Model):
     price_staff = db.Column(db.REAL)
 
 
+class Person(db.Model):
+    """  """
+    __tablename__ = "person"
 
-
+    id = db.Column(db.String(128), primary_key=True)
+    subscribed = db.Column(db.Boolean)
 
 
 db.create_all()

@@ -1,5 +1,5 @@
 import traceback
-from flask import Flask, request
+from flask import request
 
 from komidabot import app, VERIFY_TOKEN
 from util import *

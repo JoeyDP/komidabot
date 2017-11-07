@@ -5,8 +5,7 @@ from .facebook.message import *
 import profile
 from flask import url_for
 
-from .database import Menu
-
+from .database import Menu, db
 
 ADMIN_SENDER_ID = os.environ.get("ADMIN_SENDER_ID")
 DISABLED = os.environ.get("DISABLED", 0) == '1'
@@ -88,7 +87,9 @@ class postback:
 
 class Komidabot(Chatbot):
     def onMessage(self, sender, message):
-        pass
+        print(sender)
+        msg = TextMessage("You are {}".format(sender))
+        msg.send(sender)
 
     @postback
     def sendWelcome(self, sender):
