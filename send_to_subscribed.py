@@ -7,11 +7,16 @@ try:
 except ImportError:
     pass
 
+import datetime
+
 from komidabot.komidabot import Komidabot
 from komidabot.database import Person
 
 if __name__ == "__main__":
-    k = Komidabot()
-    subscribed = Person.getSubscribed()
-    for person in subscribed:
-        k.sendMenu(person.id, isResponse=False)
+    # only if weekday before 14:00
+    d = datetime.datetime.now()
+    if d.isoweekday() in range(1, 6) and d.hour <= 14:
+        k = Komidabot()
+        subscribed = Person.getSubscribed()
+        for person in subscribed:
+            k.sendMenu(person.id, isResponse=False)
