@@ -167,7 +167,7 @@ def get_campusses(text):
                       ('cmi', ['cmi', 'middelheim']), ('cst', ['cst', 'stad', 'city'])]
 
     campus = sorted([c_code for c_code, c_texts in campus_options if any(c_text in text for c_text in c_texts)])
-    return campus if len(campus) > 0 else ['cmi']
+    return campus
 
 
 def get_dates(text):
@@ -187,7 +187,7 @@ def get_dates(text):
                     ('saturday', 5 - today.weekday()), ('sunday', 6 - today.weekday())]
 
     dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text])
-    return dates if len(dates) > 0 else [today]
+    return dates
 
 
 from .facebook import profile
