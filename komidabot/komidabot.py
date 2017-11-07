@@ -90,7 +90,7 @@ class Komidabot(Chatbot):
             msg = TextMessage("Your PSID is {}".format(sender))
             msg.send(sender)
 
-    def sendMenu(self, recipient, campusses=['cmi'], times=None):
+    def sendMenu(self, recipient, campusses=('cmi'), times=None, isResponse=True):
         if times is None:
             today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
             times = [today]
@@ -105,8 +105,9 @@ class Komidabot(Chatbot):
                 raise RuntimeError("Failed to send menu")
         else:
             # send a message that no menu could be found
-            failMessage = get_fail_gif()
+            failMessage, failGif = get_fail_gif()
             failMessage.send(recipient)
+            failGif.send(recipient)
 
     @postback
     def sendWelcome(self, sender):

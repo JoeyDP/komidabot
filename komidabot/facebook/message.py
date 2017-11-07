@@ -18,12 +18,18 @@ class Message:
         data["message"] = dict()
         return data
 
-    def send(self, recipient):
+    def send(self, recipient, isResponse=True):
         log("sending message to {}".format(recipient))
 
         data = self.getData()
         data["recipient"]["id"] = recipient
+        if isResponse:
+            data["messaging_type"] = "RESPONSE"
+        else:
+            data["messaging_type"] = "NON_PROMOTIONAL_SUBSCRIPTION"
+
         jsonData = json.dumps(data)
+        print(jsonData)
         r = requests.post(MESSAGE_URL, params=PARAMS, headers=HEADERS, data=jsonData)
         if r.status_code != 200:
             log(r.status_code)
@@ -42,6 +48,21 @@ class TextMessage(Message):
         data["message"]["text"] = self.text
         return data
 
+
+class ImageMessage(Message):
+    def __init__(self, image):
+        super().__init__()
+        self.image = image
+
+    def getData(self):
+        data = super().getData()
+        data["message"]["attachment"] = {
+            'type': 'image',
+            'payload': {
+                'url': self.image
+            }
+        }
+        return data
 
 class ButtonMessage(Message):
     def __init__(self, text, *buttons):

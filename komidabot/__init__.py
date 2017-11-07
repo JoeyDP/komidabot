@@ -5,7 +5,7 @@ from flask import Flask
 
 
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///menu.db')
-VERIFY_TOKEN = os.environ["VERIFY_TOKEN"]
+VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
 
 app = Flask(__name__)
 

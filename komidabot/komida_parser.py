@@ -243,7 +243,3 @@ def update_menus():
 def update():
     # update the menu
     update_menus()
-
-
-if __name__ == "__main__":
-    update()

@@ -40,4 +40,8 @@ class Person(db.Model):
         person.subscribed = False
         db.session.commit()
 
+    @staticmethod
+    def getSubscribed():
+        return Person.query.filter_by(subscribed=True).all()
+
 db.create_all()

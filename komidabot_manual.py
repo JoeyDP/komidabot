@@ -15,7 +15,7 @@ def send_menu():
     komida_parser.update()
 
     k = Komidabot()
-    k.sendMenu(FB_RECEIVER_ID)
+    k.sendMenu(FB_RECEIVER_ID, isResponse=False)
 
 
 if __name__ == "__main__":

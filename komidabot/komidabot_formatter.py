@@ -1,5 +1,5 @@
 import random
-from .facebook.message import TextMessage
+from .facebook.message import TextMessage, ImageMessage
 
 
 def create_messages(menu):
@@ -58,12 +58,11 @@ def format_menu(menu):
 
 
 def get_fail_gif():
-    fail_gifs = ['https://giphy.com/gifs/monkey-laptop-baboon-xTiTnJ3BooiDs8dL7W',
-                 'https://giphy.com/gifs/office-space-jBBRs81dGWHIY',
-                 'https://giphy.com/gifs/computer-Zw133sEVc0WXK',
-                 'https://giphy.com/gifs/computer-D8kdCAJIoSQ6I',
-                 'https://giphy.com/gifs/richard-ayoade-it-crowd-maurice-moss-dbtDDSvWErdf2']
-    message = "_COMPUTER SAYS NO._ I'm sorry, no menu has been found.\n{}".format(
-                                              random.choice(fail_gifs))
-    message = TextMessage(message)
-    return message
+    fail_gifs = ['https://media.giphy.com/media/xTiTnJ3BooiDs8dL7W/giphy.gif',
+                 'https://media.giphy.com/media/jBBRs81dGWHIY/giphy.gif',
+                 'https://media.giphy.com/media/Zw133sEVc0WXK/giphy.gif',
+                 'https://media.giphy.com/media/dbtDDSvWErdf2/giphy.gif',
+                 ]
+    text = TextMessage("_COMPUTER SAYS NO._ I'm sorry, no menu has been found.")
+    image = ImageMessage(random.choice(fail_gifs))
+    return text, image
