@@ -119,10 +119,8 @@ class Komidabot(Chatbot):
     @postback
     def sendWelcome(self, sender):
         Person.subscribe(sender)
-        msg = TextMessage("""
-        Hello there. I am the Komidabot. 
-        From now on, I will notify you each weekday of the menu in our Komida restaurants. 
-        """)
+        msg = TextMessage("Hello there. I am the Komidabot."
+                          " From now on, I will notify you each weekday of the menu in our Komida restaurants.")
         msg.send(sender)
 
         # send update if weekday and before 14:00
