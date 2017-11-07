@@ -100,14 +100,14 @@ class Komidabot(Chatbot):
             messages = create_messages(menus)
             status = True
             for message in messages:
-                status = status and message.send(recipient)
+                status = status and message.send(recipient, isResponse=isResponse)
             if not status:
                 raise RuntimeError("Failed to send menu")
         else:
             # send a message that no menu could be found
             failMessage, failGif = get_fail_gif()
-            failMessage.send(recipient)
-            failGif.send(recipient)
+            failMessage.send(recipient, isResponse=isResponse)
+            failGif.send(recipient, isResponse=isResponse)
 
     @postback
     def sendWelcome(self, sender):
