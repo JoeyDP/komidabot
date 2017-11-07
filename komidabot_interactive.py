@@ -3,7 +3,7 @@ from flask import request
 
 from komidabot import app, VERIFY_TOKEN
 from util import *
-from komidabot.interactive import Komidabot
+from komidabot.komidabot import Komidabot
 
 
 komidabot = Komidabot()

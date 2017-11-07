@@ -1,8 +1,8 @@
-import os
 import json
 import requests
 from util import *
-from .komidabot.komidabot import Komidabot
+from komidabot.komidabot import Komidabot
+
 
 PROFILE_URL = "https://graph.facebook.com/v2.9/me/messenger_profile"
 PARAMS = {"access_token": os.environ["PAGE_ACCESS_TOKEN"]}

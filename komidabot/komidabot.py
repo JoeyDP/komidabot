@@ -1,12 +1,10 @@
 import datetime
 
-from .facebook.message import *
 import profile
-
-from .database import Menu, Person, db
+from .database import Person
+from .facebook.message import *
 from .komida_parser import get_menu
 from .komidabot_formatter import create_messages, get_fail_gif
-
 
 ADMIN_SENDER_ID = os.environ.get("ADMIN_SENDER_ID")
 DISABLED = os.environ.get("DISABLED", 0) == '1'
@@ -147,7 +145,6 @@ class Komidabot(Chatbot):
         if ADMIN_SENDER_ID:
             notification = TextMessage("Exception:\t{}".format(str(e)))
             notification.send(ADMIN_SENDER_ID)
-
 
 # class ConfessionsAdminBot(ConfessionsBot):
 #     def onMessage(self, sender, message):
