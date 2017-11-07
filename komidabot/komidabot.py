@@ -1,5 +1,5 @@
 import random
-from facebook.message import TextMessage
+from .facebook.message import TextMessage
 
 
 def create_messages(menu):

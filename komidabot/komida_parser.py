@@ -2,9 +2,7 @@ import datetime
 import itertools
 import logging
 import collections
-import os
 import re
-import sqlite3
 import tempfile
 import urllib.parse
 
@@ -12,6 +10,10 @@ import dateparser
 import lxml.html
 import pdfquery
 import requests
+from sqlalchemy import exc
+
+from .database import Menu, db
+
 
 
 # disable low-level pdfminer logging
@@ -31,14 +33,12 @@ def get_menu(campuses, dates):
         dictionary with as key the type of menu item and as values the menu content and the prices for students and
         staff.
     """
-    conn = sqlite3.connect('menu.db')
-    c = conn.cursor()
 
     menu = collections.defaultdict(dict)
     for date, campus in itertools.product(dates, campuses):
-        c.execute('SELECT type, item, price_student, price_staff FROM menu WHERE date = ? AND campus = ?', (date, campus))
-        for menu_type, menu_item, price_student, price_staff in c.fetchall():
-            menu[(date, campus)][menu_type] = (menu_item, price_student, price_staff)
+        menuItems = Menu.query.filter_by(date=date, campus=campus).all()
+        for item in menuItems:
+            menu[(date, campus)][item.type] = (item.item, item.price_student, item.price_staff)
 
     return menu
 
@@ -204,20 +204,23 @@ def store_menu(menu):
     Args:
         menu: A dictionary of the menu in the form (date, campus, menu_type) -> (menu_item, price_student, price_staff).
     """
-    conn = sqlite3.connect('menu.db')
-    c = conn.cursor()
 
     logging.debug('Store the menu items in the database')
     for (date, campus, menu_type), (menu_item, price_student, price_staff) in menu.items():
-        try:
-            c.execute('INSERT INTO menu VALUES (?, ?, ?, ?, ?, ?)',
-                      (date, campus, menu_type, menu_item, price_student, price_staff))
-        except sqlite3.IntegrityError as e:
-            # this menu item is already present in the database
-            logging.debug('Could not insert into the menu database: {}'.format(e))
+        entry = Menu()
+        entry.date = date
+        entry.campus = campus
+        entry.type = menu_type
+        entry.item = menu_item
+        entry.price_student = price_student
+        entry.price_staff = price_staff
+        db.session.add(entry)
 
-    conn.commit()
-    conn.close()
+        try:
+            db.session.commit()
+        except exc.SQLAlchemyError as e:
+            # this menu item is most likely already present in the database
+            logging.debug('Could not insert into the menu database: {}'.format(e))
 
 
 def update_menus():
@@ -237,27 +240,7 @@ def update_menus():
             logging.error('Could not retrieve the menu for campus {}: {}'.format(campus.upper(), e))
 
 
-def init_database():
-    """
-    Initialize the menu items database.
-
-    The database contains a single `menu` table of the form `(date, campus, menu_type, menu_item, price_student, price_staff)`.
-    """
-    conn = sqlite3.connect('menu.db')
-    c = conn.cursor()
-
-    c.execute('CREATE TABLE menu (date TIMESTAMP, campus TEXT, type TEXT, item TEXT, '
-              'price_student REAL, price_staff REAL, PRIMARY KEY(date, campus, type))')
-
-    conn.commit()
-    conn.close()
-
-
 def update():
-    # create the database if needed
-    if not os.path.exists('menu.db'):
-        init_database()
-
     # update the menu
     update_menus()
 

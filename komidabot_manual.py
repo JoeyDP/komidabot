@@ -9,8 +9,8 @@ FB_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
 FB_RECEIVER_ID = os.environ["FB_RECEIVER_ID"]
 
 import datetime
-import komida_parser
-import komidabot
+from komidabot import komida_parser
+from komidabot import komidabot
 
 
 def send_menu():
