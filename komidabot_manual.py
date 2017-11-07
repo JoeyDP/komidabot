@@ -1,8 +1,11 @@
 # Load configuration variables from .env file
 import os
-from dotenv import Dotenv
-dotenv = Dotenv(os.path.join(os.path.dirname(__file__), '.env'))
-os.environ.update(dotenv)
+try:
+    from dotenv import Dotenv
+    dotenv = Dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+    os.environ.update(dotenv)
+except ImportError:
+    pass
 
 CAMPUS = os.environ.get("CAMPUS", 'cmi')
 FB_TOKEN = os.environ["PAGE_ACCESS_TOKEN"]
