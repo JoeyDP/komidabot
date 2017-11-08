@@ -163,11 +163,15 @@ def get_campusses(text):
         A list with acronyms for all UAntwerp campuses that were mentioned in the text. Defaults to CMI if no campus is
         explicitly mentioned.
     """
-    campus_options = [('cde', ['cde', 'drie eiken']), ('cgb', ['cgb', 'groenenborger']),
-                      ('cmi', ['cmi', 'middelheim']), ('cst', ['cst', 'stad', 'city'])]
+    campus_options = [
+        ('cde', ['cde', 'drie eiken']),
+        # ('cgb', ['cgb', 'groenenborger']),
+        ('cmi', ['cmi', 'middelheim']),
+        ('cst', ['cst', 'stad', 'city'])
+    ]
 
     campus = sorted([c_code for c_code, c_texts in campus_options if any(c_text in text.lower() for c_text in c_texts)])
-    return campus
+    return campus if len(campus) > 0 else ['cmi']
 
 
 def get_dates(text):
@@ -187,7 +191,7 @@ def get_dates(text):
                     ('saturday', 5 - today.weekday()), ('sunday', 6 - today.weekday())]
 
     dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text.lower()])
-    return dates
+    return dates if len(dates) > 0 else ['today']
 
 
 from .facebook import profile

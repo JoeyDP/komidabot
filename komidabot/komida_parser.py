@@ -59,8 +59,12 @@ def get_menu_url(campus):
         `LookupError`: The requested menu url could not be found on the 'Weekmenu' page.
     """
     base_url = 'https://www.uantwerpen.be/nl/campusleven/eten/weekmenu/'
-    campus_id = {'cmi': 'Campus Middelheim', 'cde': 'Campus Drie Eiken',
-                 'cgb': 'Campus Groenenborger', 'cst': 'Stadscampus'}
+    campus_id = {
+        'cmi': 'Campus Middelheim',
+        'cde': 'Campus Drie Eiken',
+        # 'cgb': 'Campus Groenenborger',
+        'cst': 'Stadscampus'
+    }
 
     # find the menu for the specified campus
     logging.debug("Load the general 'Weekmenu' page")
