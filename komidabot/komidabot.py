@@ -104,7 +104,7 @@ class Komidabot(Chatbot):
         times = [time for time in times if time.isoweekday() in range(1, 6)]
         if len(campusses) == 0:
             for time in times:
-                campus = p.getDefaultCampus(time.isoweekday)
+                campus = p.getDefaultCampus(time.isoweekday())
                 self.sendMenu(sender, [campus], [time])     # only send default campus, not product
                 return
         elif len(campusses) == 1:
