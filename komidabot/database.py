@@ -1,5 +1,7 @@
 from komidabot import db
 
+CAMPUSSES = ['cmi', 'cde', 'cst']
+DEFAULT_CAMPUS = CAMPUSSES[0]
 
 class Menu(db.Model):
     """ Database table for Komida menu. """
@@ -19,6 +21,15 @@ class Person(db.Model):
 
     id = db.Column(db.String(128), primary_key=True)
     subscribed = db.Column(db.Boolean, default=True)
+    default_mo = db.Column(db.String(5), default=DEFAULT_CAMPUS)
+    default_tu = db.Column(db.String(5), default=DEFAULT_CAMPUS)
+    default_we = db.Column(db.String(5), default=DEFAULT_CAMPUS)
+    default_th = db.Column(db.String(5), default=DEFAULT_CAMPUS)
+    default_fr = db.Column(db.String(5), default=DEFAULT_CAMPUS)
+
+    @staticmethod
+    def findById(sender_id):
+        return Person.query.filter_by(id=sender_id).one()
 
     @staticmethod
     def subscribe(sender_id):
@@ -43,5 +54,24 @@ class Person(db.Model):
     @staticmethod
     def getSubscribed():
         return Person.query.filter_by(subscribed=True).all()
+
+    def getDefaultCampus(self, dayOfWeek):
+        assert(dayOfWeek in range(1, 6))
+        attributes = [self.default_mo, self.default_tu, self.default_we, self.default_th, self.default_fr]
+        return attributes[dayOfWeek - 1]
+
+    def setDefaultCampus(self, campus, dayOfWeek):
+        assert(campus in CAMPUSSES)
+        assert(dayOfWeek in range(1, 6))
+        if dayOfWeek == 1:
+            self.default_mo = campus
+        elif dayOfWeek == 2:
+            self.default_tu = campus
+        elif dayOfWeek == 3:
+            self.default_we = campus
+        elif dayOfWeek == 4:
+            self.default_th = campus
+        elif dayOfWeek == 5:
+            self.default_fr = campus
 
 db.create_all()

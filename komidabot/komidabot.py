@@ -92,8 +92,27 @@ class Komidabot(Chatbot):
         else:
             campusses = get_campusses(message)
             times = get_dates(message)
-            if campusses and times:
-                self.sendMenu(sender, campusses, times)
+            if campusses or times:
+                self.requestedMenu(sender, campusses, times)
+
+    def requestedMenu(self, sender, campusses, times):
+        p = Person.findById(sender)
+        if len(times) == 0:
+            today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+            times = [today]
+
+        times = [time for time in times if time.isoweekday() in range(1, 6)]
+        if len(campusses) == 0:
+            for time in times:
+                campus = p.getDefaultCampus(time.isoweekday)
+                self.sendMenu(sender, [campus], [time])     # only send default campus, not product
+                return
+        elif len(campusses) == 1:
+            # set campus as default
+            for weekday in [time.isoweekday() for time in times]:
+                p.setDefaultCampus(campusses[0], weekday)
+
+        self.sendMenu(sender, campusses, times)
 
     def sendMenu(self, recipient, campusses=None, times=None, isResponse=True):
         if campusses is None:
@@ -171,7 +190,7 @@ def get_campusses(text):
     ]
 
     campus = sorted([c_code for c_code, c_texts in campus_options if any(c_text in text.lower() for c_text in c_texts)])
-    return campus if len(campus) > 0 else ['cmi']
+    return campus
 
 
 def get_dates(text):
@@ -191,7 +210,7 @@ def get_dates(text):
                     ('saturday', 5 - today.weekday()), ('sunday', 6 - today.weekday())]
 
     dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text.lower()])
-    return dates if len(dates) > 0 else [today]
+    return dates
 
 
 from .facebook import profile
