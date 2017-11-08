@@ -5,7 +5,7 @@ komidabot
 
 A chat bot to request the daily menu at the [komida restaurants](https://www.uantwerpen.be/en/campus-life/catering/) of the [University of Antwerp](https://www.uantwerpen.be/en/).
 
-![komidabot](res/komidabot.png)
+![komidabot](res/komidabot_fb.jpg)
 
 About
 -----
