@@ -92,7 +92,8 @@ class Komidabot(Chatbot):
         else:
             campusses = get_campusses(message)
             times = get_dates(message)
-            if campusses or times:
+            keywordFound = any(kw in message.lower() for kw in ['lunch', 'menu', 'komida'])
+            if campusses or times or keywordFound:
                 self.requestedMenu(sender, campusses, times)
 
     def requestedMenu(self, sender, campusses, times):
