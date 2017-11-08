@@ -55,6 +55,9 @@ class Person(db.Model):
     def getSubscribed():
         return Person.query.filter_by(subscribed=True).all()
 
+    def save(self):
+        db.session.commit()
+
     def getDefaultCampus(self, dayOfWeek):
         assert(dayOfWeek in range(1, 6))
         attributes = [self.default_mo, self.default_tu, self.default_we, self.default_th, self.default_fr]

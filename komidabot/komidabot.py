@@ -111,6 +111,7 @@ class Komidabot(Chatbot):
             # set campus as default
             for weekday in [time.isoweekday() for time in times]:
                 p.setDefaultCampus(campusses[0], weekday)
+            p.save()
 
         self.sendMenu(sender, campusses, times)
 
