@@ -191,7 +191,7 @@ def get_dates(text):
                     ('saturday', 5 - today.weekday()), ('sunday', 6 - today.weekday())]
 
     dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text.lower()])
-    return dates if len(dates) > 0 else ['today']
+    return dates if len(dates) > 0 else [today]
 
 
 from .facebook import profile
