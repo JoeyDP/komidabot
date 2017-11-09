@@ -1,3 +1,4 @@
+import datetime
 from komidabot import db
 
 CAMPUSSES = ['cmi', 'cde', 'cst']
@@ -21,11 +22,15 @@ class Person(db.Model):
 
     id = db.Column(db.String(128), primary_key=True)
     subscribed = db.Column(db.Boolean, default=True)
+
     default_mo = db.Column(db.String(5), default=DEFAULT_CAMPUS)
     default_tu = db.Column(db.String(5), default=DEFAULT_CAMPUS)
     default_we = db.Column(db.String(5), default=DEFAULT_CAMPUS)
     default_th = db.Column(db.String(5), default=DEFAULT_CAMPUS)
     default_fr = db.Column(db.String(5), default=DEFAULT_CAMPUS)
+
+    time_joined = db.Column(db.DateTime, default=datetime.datetime.now)
+    time_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
 
     @staticmethod
     def findByIdOrCreate(sender_id):
