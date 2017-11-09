@@ -97,7 +97,7 @@ class Komidabot(Chatbot):
                 self.requestedMenu(sender, campusses, times)
 
     def requestedMenu(self, sender, campusses, times):
-        p = Person.findById(sender)
+        p = Person.findByIdOrCreate(sender)
         if len(times) == 0:
             today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
             times = [today]

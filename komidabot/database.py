@@ -28,8 +28,14 @@ class Person(db.Model):
     default_fr = db.Column(db.String(5), default=DEFAULT_CAMPUS)
 
     @staticmethod
-    def findById(sender_id):
-        return Person.query.filter_by(id=sender_id).one()
+    def findByIdOrCreate(sender_id):
+        p = Person.query.filter_by(id=sender_id).one()
+        if not p:
+            p = Person()
+            p.id = sender_id
+            db.session.add(p)
+            db.session.commit()
+        return p
 
     @staticmethod
     def subscribe(sender_id):
