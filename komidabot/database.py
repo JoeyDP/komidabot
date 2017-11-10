@@ -34,7 +34,7 @@ class Person(db.Model):
 
     @staticmethod
     def findByIdOrCreate(sender_id):
-        p = Person.query.filter_by(id=sender_id).one()
+        p = Person.query.filter_by(id=sender_id).one_or_none()
         if not p:
             p = Person()
             p.id = sender_id
