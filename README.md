@@ -10,7 +10,7 @@ A chat bot to request the daily menu at the [komida restaurants](https://www.uan
 About
 -----
 
-Komidabot retrieves the [menu for the komida restaurants](https://www.uantwerpen.be/nl/campusleven/eten/weekmenu/) at the University of Antwerp and lets you know what's for lunch on Slack.
+Komidabot retrieves the [menu for the komida restaurants](https://www.uantwerpen.be/nl/campusleven/eten/weekmenu/) at the University of Antwerp and lets you know what's for lunch on Facebook.
 
 There are two modes of operation for the bot. Manual and interactive.
 
