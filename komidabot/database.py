@@ -30,7 +30,7 @@ class Person(db.Model):
     default_fr = db.Column(db.String(5), default=DEFAULT_CAMPUS)
 
     time_joined = db.Column(db.DateTime, default=datetime.datetime.now)
-    time_updated = db.Column(db.DateTime, onupdate=datetime.datetime.now)
+    time_updated = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
     @staticmethod
     def findByIdOrCreate(sender_id):

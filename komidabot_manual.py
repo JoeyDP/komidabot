@@ -1,3 +1,5 @@
+#!env/bin/python
+
 # Load configuration variables from .env file
 import os
 try:
