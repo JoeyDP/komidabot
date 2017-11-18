@@ -3,7 +3,7 @@ import json
 
 from util import *
 
-MESSAGE_URL = "https://graph.facebook.com/v2.10/me/messages"
+MESSAGE_URL = "https://graph.facebook.com/v2.11/me/messages"
 PARAMS = {"access_token": os.environ["PAGE_ACCESS_TOKEN"]}
 HEADERS = {"Content-Type": "application/json"}
 
