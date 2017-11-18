@@ -1,6 +1,6 @@
 import random
-from .facebook.message import TextMessage, ImageMessage
-
+from .facebook.message import TextMessage, ImageMessage, URLAttachmentMessage
+from .komida_parser import get_menu_url
 
 def create_messages(menu):
     """
@@ -16,7 +16,8 @@ def create_messages(menu):
     for (date, campus), menu_items in menu.items():
         title = 'Menu at {} on {}'.format(campus.upper(), date.strftime('%A %d %B'))
         text = format_menu(menu_items)
-        message = TextMessage("{}\n\n{}".format(title, text))
+        menu_url = get_menu_url(campus)
+        message = URLAttachmentMessage("{}\n\n{}".format(title, text), menu_url)
         messages.append(message)
 
     return messages

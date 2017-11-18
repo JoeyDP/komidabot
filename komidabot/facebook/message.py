@@ -48,20 +48,28 @@ class TextMessage(Message):
         return data
 
 
-class ImageMessage(Message):
-    def __init__(self, image):
-        super().__init__()
-        self.image = image
+class URLAttachmentMessage(TextMessage):
+    def __init__(self, text, url, attachmentType='file'):
+        super().__init__(text)
+        self.text = text
+        self.url = url
+        self.attachmentType = attachmentType
 
     def getData(self):
         data = super().getData()
         data["message"]["attachment"] = {
-            'type': 'image',
+            'type': self.attachmentType,
             'payload': {
-                'url': self.image
+                'url': self.url
             }
         }
         return data
+
+
+class ImageMessage(URLAttachmentMessage):
+    def __init__(self, image):
+        super().__init__("", image, attachmentType='image')
+
 
 class ButtonMessage(Message):
     def __init__(self, text, *buttons):
