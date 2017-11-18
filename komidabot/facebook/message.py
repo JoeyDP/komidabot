@@ -29,6 +29,7 @@ class Message:
             data["messaging_type"] = "NON_PROMOTIONAL_SUBSCRIPTION"
 
         jsonData = json.dumps(data)
+        log(jsonData)
         r = requests.post(MESSAGE_URL, params=PARAMS, headers=HEADERS, data=jsonData)
         if r.status_code != 200:
             log(r.status_code)
