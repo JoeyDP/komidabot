@@ -95,6 +95,9 @@ class Komidabot(Chatbot):
             keywordFound = any(kw in message.lower() for kw in ['lunch', 'menu', 'komida'])
             if campusses or times or keywordFound:
                 self.requestedMenu(sender, campusses, times)
+            else:
+                message = TextMessage("I don't understand. Use the keywords listed on https://www.facebook.com/Komidabot-UA-1502601723123151/.")
+                message.send(sender)
 
     def requestedMenu(self, sender, campusses, times):
         p = Person.findByIdOrCreate(sender)
@@ -142,6 +145,19 @@ class Komidabot(Chatbot):
         Person.subscribe(sender)
         msg = TextMessage("Hello there. I am the Komidabot."
                           " From now on, I will notify you each weekday of the menu in our Komida restaurants.")
+        msg.send(sender)
+        msg = TextMessage("""
+            The Komidabot will also reply to menu requests by:
+            Campus choice
+            - cst
+            - cmi
+            - cde
+            Date
+            - the day of the week (Monday - Sunday) 
+            - temporal nouns (yesterday, today and tomorrow)
+            Lunch (today's menu at your preferred campus)
+            - lunch, menu, komida
+            """)
         msg.send(sender)
 
         # send update if weekday and before 14:00
