@@ -208,8 +208,7 @@ def get_dates(text):
     today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
     date_options = [('today', 0), ('tomorrow', 1), ('yesterday', -1), ('monday', 0 - today.weekday()),
                     ('tuesday', 1 - today.weekday()), ('wednesday', 2 - today.weekday()),
-                    ('thursday', 3 - today.weekday()), ('friday', 4 - today.weekday()),
-                    ('saturday', 5 - today.weekday()), ('sunday', 6 - today.weekday())]
+                    ('thursday', 3 - today.weekday()), ('friday', 4 - today.weekday())]
 
     dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text.lower()])
     return dates

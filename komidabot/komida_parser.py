@@ -196,7 +196,8 @@ def parse_pdf(f_pdf, campus):
             menu_items = [menu_item]
 
         for date, (i, item) in itertools.product(dates, enumerate(menu_items)):
-            menu[(date, campus, '{}{}'.format(menu_type, i + 1 if len(menu_items) > 1 else ''))] = (item, price[i * 2], price[i * 2 + 1])
+            prices = (price[i * 2], price[i * 2 + 1]) if len(price) > 2*i+1 else (price[-2], price[-1])
+            menu[(date, campus, '{}{}'.format(menu_type, i + 1 if len(menu_items) > 1 else ''))] = (item, *prices)
 
     return menu
 
@@ -242,7 +243,7 @@ def update_menus():
                 store_menu(menu)
         except (requests.HTTPError, LookupError) as e:
             logging.error('Could not retrieve the menu for campus {}: {}'.format(campus.upper(), e))
-
+            
 
 def update():
     # update the menu
