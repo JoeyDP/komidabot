@@ -181,8 +181,7 @@ def get_campusses(text):
     Args:
         text: The text in which the occurrence of the campuses is checked.
     Returns:
-        A list with acronyms for all UAntwerp campuses that were mentioned in the text. Defaults to CMI if no campus is
-        explicitly mentioned.
+        A list with acronyms for all UAntwerp campuses that were mentioned in the text.
     """
     campus_options = [
         ('cde', ['cde', 'drie eiken']),
@@ -202,16 +201,19 @@ def get_dates(text):
     Args:
         text: The text in which the occurrence of dates is checked.
     Returns:
-        A list with `datetime` objects for all of the dates that were mentioned in the text. Defaults to today if no
-        date is explicitly mentioned.
+        A list with `datetime` objects for all of the dates that were mentioned in the text.
     """
+    relative_options = [('today', 0), ('tomorrow', 1), ('yesterday', -1)]
     today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
-    date_options = [('today', 0), ('tomorrow', 1), ('yesterday', -1), ('monday', 0 - today.weekday()),
-                    ('tuesday', 1 - today.weekday()), ('wednesday', 2 - today.weekday()),
-                    ('thursday', 3 - today.weekday()), ('friday', 4 - today.weekday())]
+    dates = [today + datetime.timedelta(days=date_diff) for day, date_diff in relative_options if day in text.lower()]
 
-    dates = sorted([today + datetime.timedelta(days=date_diff) for day, date_diff in date_options if day in text.lower()])
-    return dates
+    days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']
+    absolute_options = [(day, index) for index, day in enumerate(days)]
+
+    startOfWeek = today + datetime.timedelta(days=2)
+    startOfWeek = startOfWeek - datetime.timedelta(days=startOfWeek.weekday())
+    dates += [startOfWeek + datetime.timedelta(days=date_diff) for day, date_diff in absolute_options if day in text.lower()]
+    return sorted(dates)
 
 
 from .facebook import profile

@@ -243,7 +243,7 @@ def update_menus():
                 store_menu(menu)
         except (requests.HTTPError, LookupError) as e:
             logging.error('Could not retrieve the menu for campus {}: {}'.format(campus.upper(), e))
-            
+
 
 def update():
     # update the menu
