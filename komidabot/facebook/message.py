@@ -49,10 +49,9 @@ class TextMessage(Message):
         return data
 
 
-class URLAttachmentMessage(TextMessage):
-    def __init__(self, text, url, attachmentType='file'):
-        super().__init__(text)
-        self.text = text
+class URLAttachmentMessage(Message):
+    def __init__(self, url, attachmentType='file'):
+        super().__init__()
         self.url = url
         self.attachmentType = attachmentType
 
@@ -69,7 +68,7 @@ class URLAttachmentMessage(TextMessage):
 
 class ImageMessage(URLAttachmentMessage):
     def __init__(self, image):
-        super().__init__("", image, attachmentType='image')
+        super().__init__(image, attachmentType='image')
 
 
 class ButtonMessage(Message):

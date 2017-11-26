@@ -19,7 +19,7 @@ def create_messages(menu):
         message1 = TextMessage("{}\n\n{}".format(title, text))
         messages.append(message1)
         menu_url = get_menu_url(campus)
-        message2 = URLAttachmentMessage("{}\n\n{}".format(title, text), menu_url)
+        message2 = URLAttachmentMessage(menu_url)
         messages.append(message2)
 
     return messages
