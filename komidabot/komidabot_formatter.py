@@ -18,9 +18,12 @@ def create_messages(menu):
         text = format_menu(menu_items)
         message1 = TextMessage("{}\n\n{}".format(title, text))
         messages.append(message1)
+
+    campusses = {campus for (date, campus), menu_items in menu.items()} # set to remove duplicates
+    for campus in campusses:
         menu_url = get_menu_url(campus)
-        message2 = URLAttachmentMessage(menu_url)
-        messages.append(message2)
+        message = URLAttachmentMessage(menu_url)
+        messages.append(message)
 
     return messages
 
