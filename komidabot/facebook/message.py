@@ -73,6 +73,7 @@ class URLAttachmentMessage(Message):
         }
 
         cachedID = redisCon.get(self.cache_key)
+        debug("cached id: " + str(cachedID))
         if cachedID:
             data["message"]["attachment"]["payload"] = {
                 "attachment_id": cachedID
@@ -91,7 +92,11 @@ class URLAttachmentMessage(Message):
             data = r.json()
             attachment_id = data.get('attachment_id')
             if attachment_id:
+                debug("setting cache:")
+                debug(str(self.cache_key) + "\t->\t" + str(attachment_id))
                 redisCon.set(self.cache_key, attachment_id, ex=60*60*24*7)    # cache for 1 week
+                value = redisCon.get(self.cache_key)
+                debug(value)
         return r
 
 
