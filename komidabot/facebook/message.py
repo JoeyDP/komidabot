@@ -18,7 +18,7 @@ class Message:
         data["message"] = dict()
         return data
 
-    def send(self, recipient, isResponse=True):
+    def _send(self, recipient, isResponse=True):
         log("sending message to {}".format(recipient))
 
         data = self.getData()
@@ -31,6 +31,11 @@ class Message:
         jsonData = json.dumps(data)
         log(jsonData)
         r = requests.post(MESSAGE_URL, params=PARAMS, headers=HEADERS, data=jsonData)
+        debug(r.text)
+        return r
+
+    def send(self, recipient, isResponse=True):
+        r = self._send(recipient, isResponse)
         if r.status_code != 200:
             log(r.status_code)
             log(r.text)
@@ -50,20 +55,43 @@ class TextMessage(Message):
 
 
 class URLAttachmentMessage(Message):
-    def __init__(self, url, attachmentType='file'):
+
+    cache = dict()
+
+    def __init__(self, url, attachmentType='file', isReusable=True):
         super().__init__()
         self.url = url
         self.attachmentType = attachmentType
+        self.isReusable = isReusable
 
     def getData(self):
         data = super().getData()
         data["message"]["attachment"] = {
-            'type': self.attachmentType,
-            'payload': {
-                'url': self.url
-            }
+            'type': self.attachmentType
         }
+
+        cachedID = URLAttachmentMessage.cache.get((self.url, self.attachmentType))
+        if cachedID:
+            data["message"]["attachment"]["payload"] = {
+                "attachment_id": cachedID
+            }
+        else:
+            data["message"]["attachment"]["payload"] = {
+                "url": self.url
+            }
+            if self.isReusable:
+                data["message"]["attachment"]["payload"]["is_reusable"] = True
         return data
+
+    def _send(self, *args, **kwargs):
+        r = super()._send(*args, **kwargs)
+        if self.isReusable and r.status_code == 200:
+            data = r.json()
+            debug(data)
+            attachment_id = data.get('attachment_id')
+            if attachment_id:
+                self.cache[(self.url, self.attachmentType)] = attachment_id
+        return r
 
 
 class ImageMessage(URLAttachmentMessage):
