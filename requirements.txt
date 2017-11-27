@@ -22,6 +22,7 @@ pytz==2017.3
 regex==2017.9.23
 requests==2.12.5
 roman==2.0.0
+rq==0.9.2
 ruamel.yaml==0.15.34
 six==1.11.0
 SQLAlchemy==1.1.15

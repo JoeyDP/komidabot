@@ -1,10 +1,13 @@
 import traceback
 from flask import request
+from rq.decorators import job
 
 from komidabot import app, VERIFY_TOKEN
 from util import *
 from komidabot.komidabot import Komidabot
 
+import worker
+rqCon = worker.conn
 
 komidabot = Komidabot()
 
@@ -51,13 +54,14 @@ def receivedRequest(request):
                     if not message:
                         log("Received message without text from {}.".format(str(sender)))
                         message = ""
-                    receivedMessage(sender, recipient, message)
+                    receivedMessage.delay(sender, recipient, message)
 
                 if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
                     payload = messaging_event["postback"]["payload"]  # the message's text
-                    receivedPostback(sender, recipient, payload)
+                    receivedPostback.delay(sender, recipient, payload)
 
 
+@job('default', connection=rqCon)
 def receivedMessage(sender, recipient, message):
     if sender == recipient:  # filter messages to self
         return
@@ -69,6 +73,7 @@ def receivedMessage(sender, recipient, message):
         traceback.print_exc()
 
 
+@job('default', connection=rqCon)
 def receivedPostback(sender, recipient, payload):
     try:
         komidabot.receivedPostback(sender, recipient, payload)
