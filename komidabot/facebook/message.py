@@ -2,6 +2,7 @@ import requests
 import json
 
 from util import *
+from komidabot import redisCon
 
 MESSAGE_URL = "https://graph.facebook.com/v2.11/me/messages"
 PARAMS = {"access_token": os.environ["PAGE_ACCESS_TOKEN"]}
@@ -63,6 +64,7 @@ class URLAttachmentMessage(Message):
         self.url = url
         self.attachmentType = attachmentType
         self.isReusable = isReusable
+        self.cache_key = ("fb_attachment_id", self,url, self.attachmentType)
 
     def getData(self):
         data = super().getData()
@@ -70,7 +72,7 @@ class URLAttachmentMessage(Message):
             'type': self.attachmentType
         }
 
-        cachedID = URLAttachmentMessage.cache.get((self.url, self.attachmentType))
+        cachedID = redisCon.get(self.cache_key)
         if cachedID:
             data["message"]["attachment"]["payload"] = {
                 "attachment_id": cachedID
@@ -87,10 +89,9 @@ class URLAttachmentMessage(Message):
         r = super()._send(*args, **kwargs)
         if self.isReusable and r.status_code == 200:
             data = r.json()
-            debug(data)
             attachment_id = data.get('attachment_id')
             if attachment_id:
-                self.cache[(self.url, self.attachmentType)] = attachment_id
+                redisCon.set(self.cache_key, attachment_id, ex=60*60*24*7)    # cache for 1 week
         return r
 
 

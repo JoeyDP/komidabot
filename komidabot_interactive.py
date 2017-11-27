@@ -6,8 +6,7 @@ from komidabot import app, VERIFY_TOKEN
 from util import *
 from komidabot.komidabot import Komidabot
 
-import worker
-rqCon = worker.conn
+from komidabot import redisCon
 
 komidabot = Komidabot()
 
@@ -61,7 +60,7 @@ def receivedRequest(request):
                     receivedPostback.delay(sender, recipient, payload)
 
 
-@job('default', connection=rqCon)
+@job('default', connection=redisCon)
 def receivedMessage(sender, recipient, message):
     if sender == recipient:  # filter messages to self
         return
@@ -73,7 +72,7 @@ def receivedMessage(sender, recipient, message):
         traceback.print_exc()
 
 
-@job('default', connection=rqCon)
+@job('default', connection=redisCon)
 def receivedPostback(sender, recipient, payload):
     try:
         komidabot.receivedPostback(sender, recipient, payload)
