@@ -76,7 +76,7 @@ class URLAttachmentMessage(Message):
         debug("cached id: " + str(cachedID))
         if cachedID:
             data["message"]["attachment"]["payload"] = {
-                "attachment_id": int(cachedID)
+                "attachment_id": str(cachedID)
             }
         else:
             data["message"]["attachment"]["payload"] = {
