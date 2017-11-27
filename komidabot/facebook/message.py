@@ -64,7 +64,7 @@ class URLAttachmentMessage(Message):
         self.url = url
         self.attachmentType = attachmentType
         self.isReusable = isReusable
-        self.cache_key = ("fb_attachment_id", self,url, self.attachmentType)
+        self.cache_key = ("fb_attachment_id", self.url, self.attachmentType)
 
     def getData(self):
         data = super().getData()
