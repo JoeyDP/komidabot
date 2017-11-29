@@ -152,22 +152,24 @@ class Komidabot(Chatbot):
                           " From now on, I will notify you each weekday of the menu in our Komida restaurants.")
         msg.send(sender)
         msg = TextMessage("""
-            The Komidabot will also reply to menu requests by:
+            You can also make menu requests by:
             Campus choice
-            - cst
-            - cmi
-            - cde
+             - cst
+             - cmi
+             - cde
             Date
-            - the day of the week (Monday - Sunday) 
-            - temporal nouns (yesterday, today and tomorrow)
+             - the day of the week (Monday - Sunday) 
+             - temporal nouns (yesterday, today and tomorrow)
             Lunch (today's menu at your preferred campus)
-            - lunch, menu, komida
+             - lunch, menu, komida
             """)
         msg.send(sender)
 
         # send update if weekday and before 14:00
         d = datetime.datetime.now()
         if d.isoweekday() in range(1, 6) and d.hour <= 14:
+            msg = TextMessage("Here's the menu for today:")
+            msg.send(sender)
             self.sendMenu(sender)
 
     @postback
