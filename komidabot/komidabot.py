@@ -89,6 +89,11 @@ class Komidabot(Chatbot):
         if 'psid' in message.lower():
             msg = TextMessage("Your PSID is {}".format(sender))
             msg.send(sender)
+        elif 'admin' in message.lower():
+            log("Message for admin: " + str(message))
+            if ADMIN_SENDER_ID:
+                report = TextMessage("{}:\n\"{}\"".format(sender, message))
+                report.send(ADMIN_SENDER_ID)
         else:
             campusses = get_campusses(message)
             times = get_dates(message)
