@@ -199,7 +199,7 @@ class Komidabot(Chatbot):
         if d.isoweekday() in range(1, 6) and d.hour <= 14:
             msg = TextMessage("Here's the menu for today:")
             msg.send(sender)
-            self.sendMenu(sender)
+            self.sendMenu(sender, campusses=[p.getDefaultCampus(datetime.date.today().isoweekday())])
 
     def exceptionOccured(self, e):
         log("Exception in request.")

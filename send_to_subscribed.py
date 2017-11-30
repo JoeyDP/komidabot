@@ -23,4 +23,5 @@ if __name__ == "__main__":
         for person in subscribed:
             msg = TextMessage("Here's the menu for today:")
             msg.send(person.id, isResponse=False)
-            k.sendMenu(person.id, isResponse=False, sendFail=False)
+            campus = person.getDefaultCampus(datetime.date.today().isoweekday())
+            k.sendMenu(person.id, campusses=[campus], isResponse=False, sendFail=False)
