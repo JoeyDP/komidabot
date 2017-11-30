@@ -20,8 +20,9 @@ def send_menu():
     komida_parser.update()
 
     k = Komidabot()
-    k.sendMenu(FB_RECEIVER_ID, campusses=[CAMPUS], isResponse=False)
-
+    status = k.sendMenu(FB_RECEIVER_ID, campusses=[CAMPUS], isResponse=False)
+    if not status:
+        raise RuntimeError("Failed to send menu")
 
 if __name__ == "__main__":
     send_menu()

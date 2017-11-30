@@ -124,7 +124,7 @@ class Komidabot(Chatbot):
 
         self.sendMenu(sender, campusses, times)
 
-    def sendMenu(self, recipient, campusses=None, times=None, isResponse=True):
+    def sendMenu(self, recipient, campusses=None, times=None, isResponse=True, sendFail=True):
         if campusses is None:
             campusses = ['cmi']
         if times is None:
@@ -137,9 +137,9 @@ class Komidabot(Chatbot):
             status = True
             for message in messages:
                 status = status and message.send(recipient, isResponse=isResponse)
-            if not status:
-                raise RuntimeError("Failed to send menu")
-        else:
+
+            return status
+        elif sendFail:
             # send a message that no menu could be found
             failMessage, failGif = get_fail_gif()
             failMessage.send(recipient, isResponse=isResponse)

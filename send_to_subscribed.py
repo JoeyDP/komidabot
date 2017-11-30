@@ -11,6 +11,8 @@ import datetime
 
 from komidabot.komidabot import Komidabot
 from komidabot.database import Person
+from komidabot.facebook.message import TextMessage
+
 
 if __name__ == "__main__":
     # only if weekday before 14:00
@@ -19,4 +21,6 @@ if __name__ == "__main__":
         k = Komidabot()
         subscribed = Person.getSubscribed()
         for person in subscribed:
-            k.sendMenu(person.id, isResponse=False)
+            msg = TextMessage("Here's the menu for today:")
+            msg.send(person.id)
+            k.sendMenu(person.id, isResponse=False, sendFail=False)
