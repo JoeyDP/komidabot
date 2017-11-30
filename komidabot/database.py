@@ -69,6 +69,10 @@ class Person(db.Model):
     def save(self):
         db.session.commit()
 
+    def setDefault(self, campus):
+        assert(campus in CAMPUSSES)
+        self.default_mo = self.default_tu = self.default_we = self.default_th = self.default_fr = campus
+
     def getDefaultCampus(self, dayOfWeek):
         assert(dayOfWeek in range(1, 6))
         attributes = [self.default_mo, self.default_tu, self.default_we, self.default_th, self.default_fr]

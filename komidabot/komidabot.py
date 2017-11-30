@@ -145,12 +145,19 @@ class Komidabot(Chatbot):
             failMessage.send(recipient, isResponse=isResponse)
             failGif.send(recipient, isResponse=isResponse)
 
+    def sendCampusSelect(self, sender):
+        msg = ButtonMessage("Which of the Komimda restaurants do you prefer?")
+        msg.addButton("CMI", self.selectCampus(campus="cmi"))
+        msg.addButton("CST", self.selectCampus(campus="cst"))
+        msg.addButton("CDE", self.selectCampus(campus="cde"))
+        msg.send(sender)
+
     @postback
     def sendWelcome(self, sender):
         Person.subscribe(sender)
-        msg = TextMessage("Hello there. I am the Komidabot."
-                          " From now on, I will notify you each weekday of the menu in our Komida restaurants.")
+        msg = TextMessage("Hello there. I am the Komidabot.")
         msg.send(sender)
+
         msg = TextMessage(
             "You can also make menu requests by:\n"
             "Campus choice\n"
@@ -164,29 +171,35 @@ class Komidabot(Chatbot):
             " - lunch, menu, komida")
         msg.send(sender)
 
-        # send update if weekday and before 14:00
-        d = datetime.datetime.now()
-        if d.isoweekday() in range(1, 6) and d.hour <= 14:
-            msg = TextMessage("Here's the menu for today:")
-            msg.send(sender)
-            self.sendMenu(sender)
+        self.sendCampusSelect(sender)
 
     @postback
     def subscribe(self, sender):
         Person.subscribe(sender)
-        msg = TextMessage("You are now subscribed for daily updates.")
-        msg.send(sender)
-
-        # send update if weekday and before 14:00
-        d = datetime.datetime.now()
-        if d.isoweekday() in range(1, 6) and d.hour <= 14:
-            self.sendMenu(sender)
+        self.sendCampusSelect(sender)
 
     @postback
     def unsubscribe(self, sender):
         Person.unsubscribe(sender)
         msg = TextMessage("You are no longer subscribed for daily updates.")
         msg.send(sender)
+
+    @postback
+    def selectCampus(self, sender, campus):
+        p = Person.findByIdOrCreate(sender)
+        p.subscribed = True
+        p.setDefault(campus)
+        p.save()
+
+        msg = TextMessage(" From now on, I will notify you each weekday of the menu in Komida {}.".format(campus))
+        msg.send(sender)
+
+        # send update if weekday and before 14:00
+        d = datetime.datetime.now()
+        if d.isoweekday() in range(1, 6) and d.hour <= 14:
+            msg = TextMessage("Here's the menu for today:")
+            msg.send(sender)
+            self.sendMenu(sender)
 
     def exceptionOccured(self, e):
         log("Exception in request.")
