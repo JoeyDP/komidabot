@@ -101,7 +101,7 @@ class Komidabot(Chatbot):
             if campusses or times or keywordFound:
                 self.requestedMenu(sender, campusses, times)
             else:
-                message = TextMessage("I don't understand. Use the keywords listed on https://www.facebook.com/Komidabot-UA-1502601723123151/.")
+                message = TextMessage("I don't understand. Use the keywords listed on https://www.facebook.com/komidabot/posts/1522468421136481. If your message was intended for the admin, start it with @admin")
                 message.send(sender)
 
     def requestedMenu(self, sender, campusses, times):
