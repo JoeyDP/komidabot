@@ -12,6 +12,7 @@ import datetime
 from komidabot.komidabot import Komidabot
 from komidabot.database import Person
 from komidabot.facebook.message import TextMessage
+from komidabot.komida_parser import get_menu
 
 
 if __name__ == "__main__":
@@ -21,7 +22,11 @@ if __name__ == "__main__":
         k = Komidabot()
         subscribed = Person.getSubscribed()
         for person in subscribed:
-            msg = TextMessage("Here's the menu for today:")
-            msg.send(person.id, isResponse=False)
             campus = person.getDefaultCampus(datetime.date.today().isoweekday())
-            k.sendMenu(person.id, campusses=[campus], isResponse=False, sendFail=False)
+            today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+            menus = get_menu([campus], [today])
+
+            if len(menus) > 0:
+                msg = TextMessage("Here's the menu for today:")
+                msg.send(person.id, isResponse=False)
+                k.sendMenu(person.id, campusses=[campus], isResponse=False, sendFail=False)
