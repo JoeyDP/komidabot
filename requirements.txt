@@ -26,6 +26,7 @@ rq==0.9.2
 ruamel.yaml==0.15.34
 six==1.11.0
 SQLAlchemy==1.1.15
+translate==3.5.0
 tzlocal==1.4
 umalqurra==0.2
 Werkzeug==0.12.2
