@@ -69,7 +69,7 @@ class TranslatedMenu(db.Model):
 
     @staticmethod
     def getItemsInLanguage(date, campus, language):
-        if language == DEFAULT_LANGUAGE:
+        if language == DEFAULT_LANGUAGE or language is None:
             return Menu.getItemsOn(date, campus)
         else:
             return TranslatedMenu.query\
@@ -96,7 +96,7 @@ class Person(db.Model):
     default_th = db.Column(db.String(5), default=DEFAULT_CAMPUS)
     default_fr = db.Column(db.String(5), default=DEFAULT_CAMPUS)
 
-    language = db.Column(db.String, default=DEFAULT_LANGUAGE, server_default=DEFAULT_LANGUAGE)
+    language = db.Column(db.String(5), default=DEFAULT_LANGUAGE, server_default=DEFAULT_LANGUAGE)
 
     time_joined = db.Column(db.DateTime, default=datetime.datetime.now)
     time_updated = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
