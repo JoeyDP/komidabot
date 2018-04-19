@@ -11,22 +11,39 @@ import lxml.html
 import pdfquery
 import requests
 from sqlalchemy import exc
+from googletrans import Translator
 
-from .database import Menu, db
-
-
+from .database import Menu, TranslatedMenu, db, DEFAULT_LANGUAGE
+from util import log
 
 # disable low-level pdfminer logging
 logging.getLogger('pdfminer').setLevel(logging.WARNING)
 
 
-def get_menu(campuses, dates):
+def get_translated_items(items, language):
+    translated = list()
+    translator = Translator()
+    translations = translator.translate([item.text for item in items], src=DEFAULT_LANGUAGE, dest=language)
+    for item, transObj in zip(items, translations):
+        if item.text != transObj.origin:
+            log("Invalid translation. Mismatch {} <-> {}".format(item.text, transObj.origin))
+        newItem = TranslatedMenu()
+        newItem.language = language
+        newItem.id = item.id
+        newItem.text = transObj.text
+        translated.append(newItem)
+
+    return translated
+
+
+def get_menu(campuses, dates, language=DEFAULT_LANGUAGE):
     """
     Retrieve the menu on the given dates for the given campuses from the database.
 
     Args:
         campuses: The campuses for which the menu is retrieved.
         dates: The dates for which the menu is retrieved.
+        language: Requested language
 
     Returns:
         A nested dictionary with as keys the requested dates and campuses, and for each of these possibilities a
@@ -36,11 +53,20 @@ def get_menu(campuses, dates):
 
     menu = collections.defaultdict(dict)
     for date, campus in itertools.product(dates, campuses):
-        menuItems = Menu.query.filter_by(date=date, campus=campus).all()
+        menuItems = TranslatedMenu.getItemsInLanguage(date, campus, language)
+        if len(menuItems) == 0 and language != DEFAULT_LANGUAGE:
+            default_items = Menu.getItemsOn(date, campus)
+            menuItems = get_translated_items(default_items, language)
+            TranslatedMenu.addTranslatedItems(menuItems)
+
         for item in menuItems:
-            menu[(date, campus)][item.type] = (item.item, item.price_student, item.price_staff)
+            menu[(date, campus)][item.type] = (item.text, item.price_student, item.price_staff)
 
     return menu
+
+
+def has_menu(campus, date):
+    return Menu.hasEntryOn(date, campus)
 
 
 def get_menu_url(campus):
@@ -216,7 +242,7 @@ def store_menu(menu):
         entry.date = date
         entry.campus = campus
         entry.type = menu_type
-        entry.item = menu_item
+        entry.text = menu_item
         entry.price_student = price_student
         entry.price_staff = price_staff
         db.session.add(entry)

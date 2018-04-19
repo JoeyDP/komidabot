@@ -1,23 +1,90 @@
 import datetime
 from komidabot import db
+from sqlalchemy import ForeignKey, UniqueConstraint
+
+from .facebook import user_profile
 
 CAMPUSSES = ['cmi', 'cde', 'cst']
 DEFAULT_CAMPUS = CAMPUSSES[0]
+DEFAULT_LANGUAGE = "nl_BE"
+
 
 class Menu(db.Model):
     """ Database table for Komida menu. """
     __tablename__ = "menu"
 
-    date = db.Column(db.DateTime, primary_key=True)
-    campus = db.Column(db.String, primary_key=True)
-    type = db.Column(db.String, primary_key=True)
-    item = db.Column(db.String)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    date = db.Column(db.DateTime)
+    campus = db.Column(db.String)
+    type = db.Column(db.String)
+    text = db.Column(db.String)
     price_student = db.Column(db.REAL)
     price_staff = db.Column(db.REAL)
 
+    UniqueConstraint(date, campus, type, name="constraint_unique_menu_item")
+
+    @staticmethod
+    def getItemsOn(date, campus):
+        return Menu.query.filter_by(date=date, campus=campus).all()
+
+    @staticmethod
+    def hasEntryOn(date, campus):
+        item = Menu.query.filter_by(date=date, campus=campus, type='meat').one_or_none()
+        return item is not None
+
+
+class TranslatedMenu(db.Model):
+    id = db.Column(ForeignKey("menu.id"), primary_key=True)
+    item = db.relationship(Menu)
+    language = db.Column(db.String, primary_key=True)
+    translation = db.Column(db.String)
+
+    @property
+    def text(self):
+        return self.translation
+
+    @text.setter
+    def text(self, value):
+        self.translation = value
+
+    @property
+    def type(self):
+        return self.item.type
+
+    @property
+    def price_student(self):
+        return self.item.price_student
+
+    @property
+    def price_staff(self):
+        return self.item.price_staff
+
+    @property
+    def date(self):
+        return self.item.date
+
+    @property
+    def campus(self):
+        return self.item.campus
+
+    @staticmethod
+    def getItemsInLanguage(date, campus, language):
+        if language == DEFAULT_LANGUAGE:
+            return Menu.getItemsOn(date, campus)
+        else:
+            return TranslatedMenu.query\
+                .filter(Menu.date == date, Menu.campus == campus)\
+                .filter_by(language=language)\
+                .all()
+
+    @staticmethod
+    def addTranslatedItems(items):
+        for item in items:
+            db.session.add(item)
+        db.session.commit()
+
 
 class Person(db.Model):
-    """  """
     __tablename__ = "person"
 
     id = db.Column(db.String(128), primary_key=True)
@@ -29,37 +96,44 @@ class Person(db.Model):
     default_th = db.Column(db.String(5), default=DEFAULT_CAMPUS)
     default_fr = db.Column(db.String(5), default=DEFAULT_CAMPUS)
 
+    language = db.Column(db.String, default=DEFAULT_LANGUAGE, server_default=DEFAULT_LANGUAGE)
+
     time_joined = db.Column(db.DateTime, default=datetime.datetime.now)
     time_updated = db.Column(db.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+
+    def __init__(self, sender_id=None):
+        if sender_id is not None:
+            self.id = sender_id
+            self.language = user_profile.getLocale(sender_id)
+            db.session.add(self)
 
     @staticmethod
     def findByIdOrCreate(sender_id):
         p = Person.query.filter_by(id=sender_id).one_or_none()
         if not p:
-            p = Person()
-            p.id = sender_id
-            db.session.add(p)
+            p = Person(sender_id)
             db.session.commit()
+        elif p.language is None:
+            p.language = user_profile.getLocale(sender_id)  # set language
+
         return p
 
     @staticmethod
     def subscribe(sender_id):
         person = Person.query.filter_by(id=sender_id).one_or_none()
         if not person:
-            person = Person()
-            person.id = sender_id
-            db.session.add(person)
+            person = Person(sender_id)
         person.subscribed = True
+        person.language = user_profile.getLocale(sender_id)     # update language for the occasion
         db.session.commit()
 
     @staticmethod
     def unsubscribe(sender_id):
         person = Person.query.filter_by(id=sender_id).one_or_none()
         if not person:
-            person = Person()
-            person.id = sender_id
-            db.session.add(person)
+            person = Person(sender_id)
         person.subscribed = False
+        person.language = user_profile.getLocale(sender_id)     # update language for the occasion
         db.session.commit()
 
     @staticmethod

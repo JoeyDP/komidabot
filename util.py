@@ -1,9 +1,8 @@
 import os
 import sys
-import json
 
 # If in debug mode.
-DEBUG = os.getenv("DEBUG", False)
+DEBUG = os.environ.get("DEBUG", False)
 
 
 def log(message="", debug=False):
@@ -18,9 +17,3 @@ def log(message="", debug=False):
 def debug(message=""):
     log(message, debug=True)
 
-
-# class CustomEncoder(json.JSONEncoder):
-#     def default(self, obj):
-#         if isinstance(obj, LazyString):
-#             return str(obj)
-#         return json.JSONEncoder.default(self, obj)

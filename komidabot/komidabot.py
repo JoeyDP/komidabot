@@ -4,6 +4,7 @@ from .database import Person
 from .facebook.message import *
 from .komida_parser import get_menu
 from .komidabot_formatter import create_messages, get_fail_gif
+from .facebook import user_profile
 
 ADMIN_SENDER_ID = os.environ.get("ADMIN_SENDER_ID")
 DISABLED = os.environ.get("DISABLED", 0) == '1'
@@ -65,7 +66,7 @@ class Chatbot:
     def runSetup(self, sender, message):
         response = TextMessage("Running setup")
         response.send(sender)
-        profile.setup()
+        chat_profile.setup()
         return True
 
 
@@ -94,6 +95,11 @@ class Komidabot(Chatbot):
             if ADMIN_SENDER_ID:
                 report = TextMessage("{}:\n\"{}\"".format(sender, message))
                 report.send(ADMIN_SENDER_ID)
+                message = TextMessage("Your message was sent to the admin.")
+                message.send(sender)
+            else:
+                message = TextMessage("Couldn't reach the admin.")
+                message.send(sender)
         else:
             campusses = get_campusses(message)
             times = get_dates(message)
@@ -101,8 +107,11 @@ class Komidabot(Chatbot):
             if campusses or times or keywordFound:
                 self.requestedMenu(sender, campusses, times)
             else:
-                message = TextMessage("I don't understand. Use the keywords listed on https://www.facebook.com/komidabot/posts/1522468421136481. If your message was intended for the admin, start it with @admin")
+                message = TextMessage("I'm sorry I don't understand. "
+                                      "My intelligence is very limited :(. "
+                                      "Here's what I do know:")
                 message.send(sender)
+                self.sendInstructions(sender)
 
     def requestedMenu(self, sender, campusses, times):
         p = Person.findByIdOrCreate(sender)
@@ -114,7 +123,7 @@ class Komidabot(Chatbot):
         if len(campusses) == 0:
             for time in times:
                 campus = p.getDefaultCampus(time.isoweekday())
-                self.sendMenu(sender, [campus], [time])     # only send default campus, not product
+                self.sendMenu(p, [campus], [time])     # only send default campus, not product
                 return
         elif len(campusses) == 1:
             # set campus as default
@@ -122,44 +131,40 @@ class Komidabot(Chatbot):
                 p.setDefaultCampus(campusses[0], weekday)
             p.save()
 
-        self.sendMenu(sender, campusses, times)
+        self.sendMenu(p, campusses, times)
 
-    def sendMenu(self, recipient, campusses=None, times=None, isResponse=True, sendFail=True):
+    def sendMenu(self, person, campusses=None, times=None, isResponse=True, sendFail=True):
         if campusses is None:
             campusses = ['cmi']
         if times is None:
             today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
             times = [today]
-        menus = get_menu(campusses, times)
+        menus = get_menu(campusses, times, person.language)
 
         if len(menus) > 0:
             messages = create_messages(menus)
             status = True
             for message in messages:
-                status = status and message.send(recipient, isResponse=isResponse)
+                status = status and message.send(person.id, isResponse=isResponse)
 
             return status
         elif sendFail:
             # send a message that no menu could be found
             failMessage, failGif = get_fail_gif()
-            failMessage.send(recipient, isResponse=isResponse)
-            failGif.send(recipient, isResponse=isResponse)
+            failMessage.send(person.id, isResponse=isResponse)
+            failGif.send(person.id, isResponse=isResponse)
 
-    def sendCampusSelect(self, sender):
+    def sendCampusSelect(self, sender, extraInfo=False):
         msg = ButtonMessage("Which of the Komimda restaurants do you prefer?")
-        msg.addButton("CMI", self.selectCampus(campus="cmi"))
-        msg.addButton("CST", self.selectCampus(campus="cst"))
-        msg.addButton("CDE", self.selectCampus(campus="cde"))
+        msg.addButton("CMI", self.selectCampus(campus="cmi", extraInfo=extraInfo))
+        msg.addButton("CST", self.selectCampus(campus="cst", extraInfo=extraInfo))
+        msg.addButton("CDE", self.selectCampus(campus="cde", extraInfo=extraInfo))
         msg.send(sender)
 
-    @postback
-    def sendWelcome(self, sender):
-        Person.subscribe(sender)
-        msg = TextMessage("Hello there. I am the Komidabot.")
-        msg.send(sender)
-
+    def sendInstructions(self, sender, includeAlso=False):
+        alsoText = "also " if includeAlso else ""
         msg = TextMessage(
-            "You can also make menu requests by:\n"
+            "You can {}make menu requests by:\n".format(alsoText) +
             "Campus choice\n"
             " - cst\n"
             " - cmi\n"
@@ -168,10 +173,19 @@ class Komidabot(Chatbot):
             " - the day of the week (Monday - Sunday)\n"
             " - temporal nouns (yesterday, today and tomorrow)\n"
             "Lunch (today's menu at your preferred campus)\n"
-            " - lunch, menu, komida")
+            " - lunch, menu, komida\n"
+            "\n"
+            "Use @admin if you want to reach the admin."
+        )
         msg.send(sender)
 
-        self.sendCampusSelect(sender)
+    @postback
+    def sendWelcome(self, sender):
+        Person.subscribe(sender)
+        msg = TextMessage("Hello there. I am the Komidabot.")
+        msg.send(sender)
+
+        self.sendCampusSelect(sender, extraInfo=True)
 
     @postback
     def subscribe(self, sender):
@@ -185,21 +199,34 @@ class Komidabot(Chatbot):
         msg.send(sender)
 
     @postback
-    def selectCampus(self, sender, campus):
+    def setLanguage(self, sender, language):
+        p = Person.findByIdOrCreate(sender)
+
+        if language is None:
+            language = user_profile.getLocale(sender)
+
+        if language is not None:
+            p.language = language
+            p.save()
+
+            msg = TextMessage("Language set to {}.".format(language))
+            msg.send(sender)
+        else:
+            msg = TextMessage("Failed to set language.")
+            msg.send(sender)
+
+    @postback
+    def selectCampus(self, sender, campus, extraInfo):
         p = Person.findByIdOrCreate(sender)
         p.subscribed = True
         p.setDefault(campus)
         p.save()
 
-        msg = TextMessage(" From now on, I will notify you each weekday of the menu in Komida {}.".format(campus))
+        msg = TextMessage("From now on, I will notify you each weekday of the menu in Komida {}.".format(campus))
         msg.send(sender)
 
-        # send update if weekday and before 14:00
-        d = datetime.datetime.now()
-        if d.isoweekday() in range(1, 6) and d.hour <= 14:
-            msg = TextMessage("Here's the menu for today:")
-            msg.send(sender)
-            self.sendMenu(sender, campusses=[p.getDefaultCampus(datetime.date.today().isoweekday())])
+        if extraInfo:
+            self.sendInstructions(sender, includeAlso=True)
 
     def exceptionOccured(self, e):
         log("Exception in request.")
@@ -251,4 +278,4 @@ def get_dates(text):
     return sorted(dates)
 
 
-from .facebook import profile
+from .facebook import chat_profile
