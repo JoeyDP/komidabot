@@ -6,7 +6,8 @@ from .facebook import user_profile
 
 CAMPUSSES = ['cmi', 'cde', 'cst']
 DEFAULT_CAMPUS = CAMPUSSES[0]
-DEFAULT_LANGUAGE = "nl_BE"
+DEFAULT_LANGUAGE = 'nl_BE'
+DEFAULT_LANGUAGE_VARIANTS = ['nl_BE', 'nl_NL']
 
 
 class Menu(db.Model):
@@ -69,11 +70,11 @@ class TranslatedMenu(db.Model):
 
     @staticmethod
     def getItemsInLanguage(date, campus, language):
-        if language == DEFAULT_LANGUAGE or language is None:
+        if language == DEFAULT_LANGUAGE or language is None or language in DEFAULT_LANGUAGE_VARIANTS:
             return Menu.getItemsOn(date, campus)
         else:
             return TranslatedMenu.query\
-                .filter(Menu.date == date, Menu.campus == campus)\
+                .filter(TranslatedMenu.item.date == date, TranslatedMenu.item.campus == campus)\
                 .filter_by(language=language)\
                 .all()
 
