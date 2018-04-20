@@ -73,9 +73,10 @@ class TranslatedMenu(db.Model):
         if language == DEFAULT_LANGUAGE or language is None or language in DEFAULT_LANGUAGE_VARIANTS:
             return Menu.getItemsOn(date, campus)
         else:
-            return TranslatedMenu.query.join(Menu)\
-                .filter(Menu.date == date, Menu.campus == campus)\
+            return TranslatedMenu.query \
                 .filter_by(language=language)\
+                .join(Menu)\
+                .filter(Menu.date == date, Menu.campus == campus)\
                 .all()
 
     @staticmethod
