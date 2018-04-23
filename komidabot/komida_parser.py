@@ -21,6 +21,7 @@ logging.getLogger('pdfminer').setLevel(logging.WARNING)
 
 
 def get_translated_items(items, language):
+    """ Translates menu items. Throws ValueError when it can't translate to the destination language. """
     translated = list()
     translator = Translator()
     translations = translator.translate([item.text for item in items], src=DEFAULT_LANGUAGE, dest=language)
@@ -55,9 +56,13 @@ def get_menu(campuses, dates, language=DEFAULT_LANGUAGE):
     for date, campus in itertools.product(dates, campuses):
         menuItems = TranslatedMenu.getItemsInLanguage(date, campus, language)
         if len(menuItems) == 0 and language != DEFAULT_LANGUAGE:
-            default_items = Menu.getItemsOn(date, campus)
-            menuItems = get_translated_items(default_items, language)
-            TranslatedMenu.addTranslatedItems(menuItems)
+            menuItems = Menu.getItemsOn(date, campus)
+            try:
+                menuItems = get_translated_items(menuItems, language)
+                TranslatedMenu.addTranslatedItems(menuItems)
+            except ValueError as e:
+                log("Failed to translate to {}".format(language))
+                log(e)
 
         for item in menuItems:
             menu[(date, campus)][item.type] = (item.text, item.price_student, item.price_staff)
