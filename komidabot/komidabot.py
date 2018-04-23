@@ -139,7 +139,7 @@ class Komidabot(Chatbot):
         if times is None:
             today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
             times = [today]
-        menus = get_menu(campusses, times, person.language)
+        menus = get_menu(campusses, times, person.getLanguage())
 
         if len(menus) > 0:
             messages = create_messages(menus)

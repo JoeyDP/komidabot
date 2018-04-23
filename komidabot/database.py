@@ -145,6 +145,11 @@ class Person(db.Model):
     def save(self):
         db.session.commit()
 
+    def getLanguage(self):
+        if self.language is None:
+            self.language = user_profile.getLocale(self.id)
+        return self.language
+
     def setDefault(self, campus):
         assert(campus in CAMPUSSES)
         self.default_mo = self.default_tu = self.default_we = self.default_th = self.default_fr = campus
@@ -167,5 +172,6 @@ class Person(db.Model):
             self.default_th = campus
         elif dayOfWeek == 5:
             self.default_fr = campus
+
 
 db.create_all()
