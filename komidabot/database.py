@@ -126,7 +126,6 @@ class Person(db.Model):
         if not person:
             person = Person(sender_id)
         person.subscribed = True
-        person.language = user_profile.getLocale(sender_id)     # update language for the occasion
         db.session.commit()
 
     @staticmethod
@@ -135,7 +134,6 @@ class Person(db.Model):
         if not person:
             person = Person(sender_id)
         person.subscribed = False
-        person.language = user_profile.getLocale(sender_id)     # update language for the occasion
         db.session.commit()
 
     @staticmethod
