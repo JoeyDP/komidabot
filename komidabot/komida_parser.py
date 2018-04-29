@@ -54,6 +54,8 @@ def get_menu(campuses, dates, language=DEFAULT_LANGUAGE):
 
     menu = collections.defaultdict(dict)
     for date, campus in itertools.product(dates, campuses):
+        if not has_menu(campus, date):
+            continue
         menuItems = TranslatedMenu.getItemsInLanguage(date, campus, language)
         if len(menuItems) == 0 and language != DEFAULT_LANGUAGE:
             menuItems = Menu.getItemsOn(date, campus)
