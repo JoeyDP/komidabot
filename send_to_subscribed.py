@@ -13,6 +13,7 @@ from komidabot.komidabot import Komidabot
 from komidabot.database import Person
 from komidabot.facebook.message import TextMessage
 from komidabot.komida_parser import has_menu
+from util import log
 
 
 if __name__ == "__main__":
@@ -22,10 +23,15 @@ if __name__ == "__main__":
         k = Komidabot()
         subscribed = Person.getSubscribed()
         for person in subscribed:
-            campus = person.getDefaultCampus(datetime.date.today().isoweekday())
-            today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+            try:
+                campus = person.getDefaultCampus(datetime.date.today().isoweekday())
+                today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 
-            if has_menu(campus, today):
-                msg = TextMessage("Here's the menu for today:")
-                msg.send(person.id, isResponse=False)
-                k.sendMenu(person, campusses=[campus], isResponse=False, sendFail=False)
+                if has_menu(campus, today):
+                    msg = TextMessage("Here's the menu for today:")
+                    msg.send(person.id, isResponse=False)
+                    k.sendMenu(person, campusses=[campus], isResponse=False, sendFail=False)
+            except Exception as e:
+                log("Exception during send_subscribed:")
+                log("With person id: " + str(person.id))
+                log(e)
