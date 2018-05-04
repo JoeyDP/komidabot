@@ -171,5 +171,8 @@ class Person(db.Model):
         elif dayOfWeek == 5:
             self.default_fr = campus
 
+    def __str__(self):
+        return str(self.id)
+
 
 db.create_all()
