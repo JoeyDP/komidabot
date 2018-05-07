@@ -12,6 +12,7 @@ from util import log
 
 @job('default', connection=redisCon)
 def sendToAll():
+    log("sendToAll()")
     # only if weekday before 14:00
     d = datetime.datetime.now()
     if d.isoweekday() in range(1, 6) and d.hour <= 14:
