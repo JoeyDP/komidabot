@@ -29,8 +29,7 @@ def sendToPerson(person):
     today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 
     if has_menu(campus, today):
-        pass
-        # msg = TextMessage("Here's the menu for today:")
-        # msg.send(person.id, isResponse=False)
-        # k.sendMenu(person, campusses=[campus], isResponse=False, sendFail=False)
+        msg = TextMessage("Here's the menu for today:")
+        msg.send(person.id, isResponse=False)
+        k.sendMenu(person, campusses=[campus], isResponse=False, sendFail=False)
 
