@@ -239,7 +239,7 @@ class Komidabot(Chatbot):
         log(str(e))
         if ADMIN_SENDER_ID:
             notification = TextMessage("Exception:\t{}".format(str(e)))
-            notification.send(ADMIN_SENDER_ID)
+            notification.send(ADMIN_SENDER_ID, isResponse=False)
 
 
 def get_campusses(text):

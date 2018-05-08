@@ -1,6 +1,6 @@
-import requests
 import json
 import grequests
+import requests     # requests should be after grequests
 
 from util import *
 from komidabot import redisCon
