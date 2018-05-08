@@ -1,6 +1,6 @@
 import json
-import grequests
-import requests     # requests should be after grequests
+import requests
+from requests_futures.sessions import FuturesSession
 
 from util import *
 from komidabot import redisCon
@@ -20,20 +20,7 @@ class Message:
         data["message"] = dict()
         return data
 
-    def getRequest(self, recipient, isResponse=True):
-        data = self.getData()
-        data["recipient"]["id"] = recipient
-        if isResponse:
-            data["messaging_type"] = "RESPONSE"
-        else:
-            data["messaging_type"] = "NON_PROMOTIONAL_SUBSCRIPTION"
-
-        jsonData = json.dumps(data)
-        log(jsonData)
-        req = grequests.post(MESSAGE_URL, params=PARAMS, headers=HEADERS, data=jsonData)
-        return req
-
-    def _send(self, recipient, isResponse=True):
+    def _send(self, recipient, isResponse=True, session=None):
         log("sending message to {}".format(recipient))
 
         data = self.getData()
@@ -45,17 +32,30 @@ class Message:
 
         jsonData = json.dumps(data)
         log(jsonData)
-        r = requests.post(MESSAGE_URL, params=PARAMS, headers=HEADERS, data=jsonData)
-        debug(r.text)
+
+        if session is None:
+            session = requests.Session()
+
+        r = session.post(MESSAGE_URL, params=PARAMS, headers=HEADERS, data=jsonData)
         return r
 
     def send(self, recipient, isResponse=True):
         r = self._send(recipient, isResponse)
+        return self._checkResponse(r)
+
+    def _checkResponse(self, r):
         if r.status_code != 200:
             log(r.status_code)
             log(r.text)
             return False
         return True
+
+    @staticmethod
+    def sendBatch(persons, messages, max_workers=10):
+        session = FuturesSession(max_workers=max_workers)
+        responses = [m._send(p, isResponse=False, session=session) for p, m in zip(persons, messages)]
+        results = [message._checkResponse(response.result()) for message, response in zip(messages, responses)]
+        return results
 
 
 class TextMessage(Message):
@@ -99,14 +99,24 @@ class URLAttachmentMessage(Message):
                 data["message"]["attachment"]["payload"]["is_reusable"] = True
         return data
 
-    def _send(self, *args, **kwargs):
-        r = super()._send(*args, **kwargs)
-        if self.isReusable and r.status_code == 200:
-            data = r.json()
-            attachment_id = data.get('attachment_id')
-            if attachment_id:
-                redisCon.set(self.cache_key, attachment_id, ex=60*60*24*7)    # cache for 1 week
-        return r
+    # def _send(self, *args, **kwargs):
+    #     r = super()._send(*args, **kwargs)
+    #     if self.isReusable and r.status_code == 200:
+    #         data = r.json()
+    #         attachment_id = data.get('attachment_id')
+    #         if attachment_id:
+    #             redisCon.set(self.cache_key, attachment_id, ex=60*60*24*7)    # cache for 1 week
+    #     return r
+
+    def _checkResponse(self, r):
+        if super()._checkResponse(r):
+            if self.isReusable:
+                data = r.json()
+                attachment_id = data.get('attachment_id')
+                if attachment_id:
+                    redisCon.set(self.cache_key, attachment_id, ex=60 * 60 * 24 * 7)  # cache for 1 week
+            return True
+        return False
 
 
 class ImageMessage(URLAttachmentMessage):

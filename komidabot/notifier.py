@@ -1,17 +1,16 @@
 import os
 import datetime
 from collections import defaultdict
+
 from rq.decorators import job
 
 from komidabot.komidabot import Komidabot
 from komidabot.database import Person
-from komidabot.facebook.message import TextMessage
+from komidabot.facebook.message import TextMessage, Message
 from komidabot.komida_parser import has_menu
 from komidabot import redisCon
 
 from util import log, debug
-
-import grequests        # import last
 
 
 BATCH_SIZE = os.environ.get("BATCH_SIZE", 10)
@@ -28,7 +27,7 @@ def sendToAll():
             messageBundles = defaultdict(list)
             for person in batch:
                 messages = getPersonMessages(person)
-                messageBundles[person].extend(messages)
+                messageBundles[person.id].extend(messages)
                 # sendToPerson(person)
 
             processMessageBundles(messageBundles)
@@ -36,7 +35,7 @@ def sendToAll():
 
 def sendToPerson(person):
     messages = getPersonMessages(person)
-    processMessageBundles({person: messages})
+    processMessageBundles({person.id: messages})
 
 
 def getPersonMessages(person):
@@ -73,7 +72,10 @@ def processMessageBundles(messageBundles):
     log("Processing Message Bundle: {}".format(messageBundles))
     persons, messages = messageBundles.keys(), messageBundles.values()
     reordered = zip(*messages)        # list of lists ([first messages, second messages, ...])
+
     for messages in reordered:
-        reqs = [m.getRequest(p.id, isResponse=False) for p, m in zip(persons, messages)]
-        grequests.map(reqs)
+        Message.sendBatch(persons, messages)
+
+        # for person, message in zip(persons, messages):
+        #     message.sendAsync(person.id, isResponse=False, session=session)
 
