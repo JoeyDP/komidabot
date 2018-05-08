@@ -1,6 +1,5 @@
 import os
 import datetime
-import grequests
 from collections import defaultdict
 from rq.decorators import job
 
@@ -11,6 +10,9 @@ from komidabot.komida_parser import has_menu
 from komidabot import redisCon
 
 from util import log, debug
+
+import grequests        # import last
+
 
 BATCH_SIZE = os.environ.get("BATCH_SIZE", 10)
 
