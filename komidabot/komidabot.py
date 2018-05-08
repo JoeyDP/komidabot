@@ -133,7 +133,7 @@ class Komidabot(Chatbot):
 
         self.sendMenu(p, campusses, times)
 
-    def sendMenu(self, person, campusses=None, times=None, isResponse=True, sendFail=True):
+    def getMenuMessages(self, person, campusses=None, times=None):
         if campusses is None:
             campusses = ['cmi']
         if times is None:
@@ -143,6 +143,12 @@ class Komidabot(Chatbot):
 
         if len(menus) > 0:
             messages = create_messages(menus)
+            return messages
+        return None
+
+    def sendMenu(self, person, campusses=None, times=None, isResponse=True, sendFail=True):
+        messages = self.getMenuMessages(person, campusses, times)
+        if messages is not None:
             status = True
             for message in messages:
                 status = status and message.send(person.id, isResponse=isResponse)

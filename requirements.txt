@@ -7,6 +7,7 @@ ephem==3.7.6.0
 Flask==0.12.2
 Flask-SQLAlchemy==2.3.2
 googletrans==2.2.0
+grequests==0.3.0
 gunicorn==19.7.1
 itsdangerous==0.24
 jdatetime==1.9.0

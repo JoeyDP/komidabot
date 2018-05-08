@@ -1,5 +1,6 @@
 import requests
 import json
+import grequests
 
 from util import *
 from komidabot import redisCon
@@ -18,6 +19,19 @@ class Message:
         data["recipient"] = dict()
         data["message"] = dict()
         return data
+
+    def getRequest(self, recipient, isResponse=True):
+        data = self.getData()
+        data["recipient"]["id"] = recipient
+        if isResponse:
+            data["messaging_type"] = "RESPONSE"
+        else:
+            data["messaging_type"] = "NON_PROMOTIONAL_SUBSCRIPTION"
+
+        jsonData = json.dumps(data)
+        log(jsonData)
+        req = grequests.post(MESSAGE_URL, params=PARAMS, headers=HEADERS, data=jsonData)
+        return req
 
     def _send(self, recipient, isResponse=True):
         log("sending message to {}".format(recipient))
