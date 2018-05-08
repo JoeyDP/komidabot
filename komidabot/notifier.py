@@ -10,7 +10,7 @@ from komidabot.facebook.message import TextMessage
 from komidabot.komida_parser import has_menu
 from komidabot import redisCon
 
-from util import log
+from util import log, debug
 
 BATCH_SIZE = os.environ.get("BATCH_SIZE", 10)
 
@@ -38,7 +38,7 @@ def sendToPerson(person):
 
 
 def getPersonMessages(person):
-    log("Sending menu to " + str(person.id))
+    log("Getting messages for " + str(person.id))
     k = Komidabot()
     campus = person.getDefaultCampus(datetime.date.today().isoweekday())
     today = datetime.datetime.today().replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
@@ -68,9 +68,10 @@ def toBatch(it):
 
 
 def processMessageBundles(messageBundles):
+    log("Processing Message Bundle: {}".format(messageBundles))
     persons, messages = messageBundles.keys(), messageBundles.values()
     reordered = zip(*messages)        # list of lists ([first messages, second messages, ...])
     for messages in reordered:
-        reqs = [m.getRequest(p, isResponse=False) for p, m in zip(persons, messages)]
+        reqs = [m.getRequest(p.id, isResponse=False) for p, m in zip(persons, messages)]
         grequests.map(reqs)
 
