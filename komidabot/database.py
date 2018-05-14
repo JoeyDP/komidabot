@@ -35,7 +35,7 @@ class Menu(db.Model):
 
 
 class TranslatedMenu(db.Model):
-    id = db.Column(ForeignKey("menu.id"), primary_key=True)
+    id = db.Column(ForeignKey("menu.id", onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
     item = db.relationship(Menu)
     language = db.Column(db.String, primary_key=True)
     translation = db.Column(db.String)
