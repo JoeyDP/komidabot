@@ -183,8 +183,10 @@ def parse_pdf(f_pdf, campus):
     end_date = dateparser.parse(re.split('|'.join(date_split_keys), week)[1], languages=['nl'])\
         if any(date_split_key in week for date_split_key in date_split_keys) else None
     # check whether the date was parsed successfully, otherwise fall back to the current week
+    print("End date:", end_date)
     if not end_date:
-        end_date = datetime.datetime.today() + datetime.timedelta(days=4 - datetime.datetime.today().weekday())
+        end_date = datetime.datetime.today() + datetime.timedelta(days=11 - datetime.datetime.today().weekday())
+        print("provisional end date:", end_date)
     end_date = end_date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 
     # parse the menu items
@@ -267,6 +269,7 @@ def update_menus():
     """
     for campus in ('cde', 'cmi', 'cst'):
         try:
+            print("Parsing menu for", campus)
             # retrieve the latest menu from the website
             menu_url = get_menu_url(campus)
             with download_pdf(menu_url) as f_pdf:
@@ -275,6 +278,8 @@ def update_menus():
                 # store the menu in the database
                 store_menu(menu)
         except (requests.HTTPError, LookupError) as e:
+            logging.error('Could not retrieve the menu for campus {}: {}'.format(campus.upper(), e))
+        except Exception as e:
             logging.error('Could not retrieve the menu for campus {}: {}'.format(campus.upper(), e))
 
 
