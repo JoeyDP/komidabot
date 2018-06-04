@@ -185,7 +185,9 @@ def parse_pdf(f_pdf, campus):
     # check whether the date was parsed successfully, otherwise fall back to the current week
     print("End date:", end_date)
     if not end_date:
-        end_date = datetime.datetime.today() + datetime.timedelta(days=11 - datetime.datetime.today().weekday())
+        start_date = datetime.datetime.today() + datetime.timedelta(days=1)     # if sunday, map to somewhere next week
+        start_date -= datetime.timedelta(days=start_date.weekday())
+        end_date = start_date + datetime.timedelta(days=4)
         print("provisional end date:", end_date)
     end_date = end_date.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 
