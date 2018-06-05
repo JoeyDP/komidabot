@@ -13,7 +13,7 @@ from komidabot import redisCon
 from util import log, debug
 
 
-BATCH_SIZE = os.environ.get("BATCH_SIZE", 10)
+BATCH_SIZE = int(os.environ.get("BATCH_SIZE", '10'))
 
 
 @job('default', connection=redisCon)
