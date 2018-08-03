@@ -57,12 +57,12 @@ def validateRequest(request):
     if advertised is None:
         return False
 
-    log("advertised sig: {}".format(str(advertised)))
+    debug("advertised sig: {}".format(str(advertised)))
 
     advertised = advertised.replace("sha1=", "")
     data = request.get_data()
 
-    log("data: {}".format(str(data)))
+    debug("data: {}".format(str(data)))
 
     received = hmac.new(
         key=CLIENT_SECRET.encode('raw_unicode_escape'),
