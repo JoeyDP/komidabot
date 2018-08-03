@@ -2,6 +2,8 @@ import traceback
 from flask import request
 from rq.decorators import job
 
+import requests
+
 from komidabot import app, VERIFY_TOKEN
 from util import *
 from komidabot.komidabot import Komidabot
@@ -41,12 +43,19 @@ def webhook():
 
 def receivedRequest(request):
     data = request.get_json()
+    debug(data)
+
     if data["object"] == "page":
 
         for entry in data["entry"]:
             for messaging_event in entry["messaging"]:
                 sender = messaging_event["sender"]["id"]        # the facebook ID of the person sending you the message
                 recipient = messaging_event["recipient"]["id"]  # the recipient's ID, which should be your page's facebook ID
+
+                # Don't mind this piece of code. It forwards requests from specific pages to another bot.
+                if recipient in ["942723909080518", "1911537602473957"]:
+                    forward('https://party-post.herokuapp.com/messenger')
+                    return
 
                 if messaging_event.get("message"):  # someone sent us a message
                     message = messaging_event["message"].get("text")
@@ -58,6 +67,17 @@ def receivedRequest(request):
                 if messaging_event.get("postback"):  # user clicked/tapped "postback" button in earlier message
                     payload = messaging_event["postback"]["payload"]  # the message's text
                     receivedPostback.delay(sender, recipient, payload)
+
+
+def forward(destinationUrl):
+    """ Forward requests to other bot. Source: https://stackoverflow.com/a/36601467 """
+    resp = requests.request(
+        method=request.method,
+        url=destinationUrl,
+        headers={key: value for (key, value) in request.headers if key != 'Host'},
+        data=request.get_data(),
+        cookies=request.cookies,
+        allow_redirects=False)
 
 
 @job('default', connection=redisCon)
