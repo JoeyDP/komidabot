@@ -234,12 +234,18 @@ class Komidabot(Chatbot):
         if extraInfo:
             self.sendInstructions(sender, includeAlso=True)
 
-    def exceptionOccured(self, e):
-        log("Exception in request.")
-        log(str(e))
+    def sendErrorMessage(self, msg):
         if ADMIN_SENDER_ID:
-            notification = TextMessage("Exception:\t{}".format(str(e)))
+            notification = TextMessage("Error:\t{}".format(msg))
             notification.send(ADMIN_SENDER_ID, isResponse=False)
+
+    def exceptionOccured(self, e, pageId=None):
+        log("Exception in request.")
+        if pageId is not None:
+            log("Error with page: " + str(pageId))
+        msg = str(e)
+        log(msg)
+        self.sendErrorMessage(msg)
 
 
 def get_campusses(text):
