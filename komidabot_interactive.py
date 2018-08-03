@@ -34,6 +34,7 @@ def webpage():
     return "Komidabot!", 200
 
 
+@app.route('/', methods=['POST'])
 def webhook():
     """ endpoint for processing incoming messaging events. """
     try:
