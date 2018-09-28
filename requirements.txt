@@ -16,7 +16,6 @@ lxml==4.2.5
 MarkupSafe==1.0
 pdfminer.six==20170720
 pdfquery==0.4.3
-pkg-resources==0.0.0
 psycopg2-binary==2.7.5
 pycryptodome==3.6.6
 pyquery==1.4.0
