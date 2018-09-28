@@ -62,7 +62,7 @@ def get_menu(campuses, dates, language=DEFAULT_LANGUAGE):
             try:
                 menuItems = get_translated_items(menuItems, language)
                 TranslatedMenu.addTranslatedItems(menuItems)
-            except ValueError as e:
+            except (ValueError, AttributeError) as e:
                 log("Failed to translate to {}".format(language))
                 log(e)
 
