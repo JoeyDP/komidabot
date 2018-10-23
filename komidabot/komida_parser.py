@@ -249,16 +249,14 @@ def store_menu(menu):
 
     logging.debug('Store the menu items in the database')
     for (date, campus, menu_type), (menu_item, price_student, price_staff) in menu.items():
-        entry = Menu()
-        entry.date = date
-        entry.campus = campus
-        entry.type = menu_type
+        entry = Menu.findEntry(date, campus, menu_type)
+        # entry.date = date
+        # entry.campus = campus
+        # entry.type = menu_type
         entry.text = menu_item
         entry.price_student = price_student
         entry.price_staff = price_staff
-        entry = db.session.merge(entry)
-        db.session.save(entry)
-        # db.session.add(entry)
+        db.session.add(entry)
 
     try:
         db.session.commit()

@@ -24,6 +24,19 @@ class Menu(db.Model):
 
     UniqueConstraint(date, campus, type, name="constraint_unique_menu_item")
 
+    def __init__(self, date=None, campus=None, tpe=None):
+        super().__init__()
+        self.date = date
+        self.campus = campus
+        self.type = tpe
+
+    @staticmethod
+    def findEntry(date, campus, type):
+        entry = Menu.query.filter_by(date=date, campus=campus, type=type).one_or_none()
+        if not entry:
+            entry = Menu(date, campus, type)
+        return entry
+
     @staticmethod
     def getItemsOn(date, campus):
         return Menu.query.filter_by(date=date, campus=campus).all()
