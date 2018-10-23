@@ -256,7 +256,8 @@ def store_menu(menu):
         entry.text = menu_item
         entry.price_student = price_student
         entry.price_staff = price_staff
-        db.session.add(entry)
+        db.session.merge(entry)
+        # db.session.add(entry)
 
     try:
         db.session.commit()
