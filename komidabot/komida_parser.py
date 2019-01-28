@@ -106,7 +106,7 @@ def get_menu_url(campus):
 
     try:
         page = lxml.html.fromstring(r_komida.content)
-        url = page.xpath('//h2[contains(text(), "{}")]/following::p[1]/a/@href'.format(campus_id[campus]))[0]
+        url = page.xpath('//h2[contains(text(), "{}")]/following::ul[1]/li/a/@href'.format(campus_id[campus]))[0]
         url = urllib.parse.urljoin('https://www.uantwerpen.be/', url)
         logging.debug('Retrieved menu url for campus {}: <{}>'.format(campus.upper(), url))
 

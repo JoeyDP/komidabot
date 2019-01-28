@@ -1,8 +1,12 @@
 import os
 import sys
+import logging
+
 
 # If in debug mode.
 DEBUG = os.environ.get("DEBUG", False)
+if DEBUG:
+    logging.getLogger().setLevel(logging.DEBUG)
 
 
 def log(message="", debug=False):
